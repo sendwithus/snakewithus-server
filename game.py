@@ -86,7 +86,7 @@ class Game(object):
                 board[x].append([])
 
         for player in players:
-            start_pos = player.queue[0]
+            start_pos = player[ 'queue' ][0]
             board[start_pos[0]][start_pos[1]].append({
                 'type': 'head',
                 'id': player['id']
@@ -119,7 +119,7 @@ class Game(object):
         pass
 
     def apply_player_move(self, player, move):
-        coords = player.queue[-1]  # head
+        coords = player[ 'queue' ][-1]  # head
         x = coords[0]
         y = coords[1]
 
@@ -147,11 +147,11 @@ class Game(object):
                 return True
             x = x - 1
 
-        player.queue.append((x, y))
+        player[ 'queue' ].append((x, y))
         board[x][y].append({'type': 'snake_head', 'id': player['id']})
 
         # remove tail from player and game board
-        tail = player.queue.pop(0)
+        tail = player[ 'queue' ].pop(0)
         square = board[tail[0]][tail[1]]
         for obj in square:
             if obj['id'] == player['id']:
