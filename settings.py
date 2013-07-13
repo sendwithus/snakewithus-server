@@ -5,5 +5,5 @@ import os
 
 STATIC_FILES_DIR = 'static'
 
-MONGODB_URL = 'http://'
+MONGODB_URL = 'mongodb://localhost:27017'
 MONGODB_DATABASE = 'snakewithus'

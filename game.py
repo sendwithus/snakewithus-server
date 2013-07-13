@@ -149,24 +149,34 @@ class Game(object):
 
         # remove tail from player and game board
         tail = player.queue.pop(0)
-        i = 0
-        for obj in board[tail[0]][tail[1]]:
-            i += 1
+        square = board[tail[0]][tail[1]]
+        for obj in square:
             if obj.id == player.id:
-                obj.pop(i)
+                square.remove(obj)
+
+        if x > self.document.width or x < 0 or y < 0 or y > self.document.height:
+            return True
+        return False
 
     def _give_food(self, snake_id):
         # give food to this snake
         for snake in self.document.state.snakes:
             if snake.id == snake_id:
                 snake.stats.food += 1
+                return
 
     def _give_kill(self, snake_id):
         # give kills to this snake
         for snake in self.document.state.snakes:
             if snake.id == snake_id:
                 snake.stats.kills += 1
-        return
+                return
+
+    def _set_snake_message(snake_id, message):
+        for snake in self.document.state.snakes:
+            if snake.id == snake_id:
+                snake.messages = message
+                return
 
     def tick(self):
         snapshot = self.document.state.copy()
@@ -174,7 +184,10 @@ class Game(object):
         to_kill = []
         for player in self.document.players:
             response = requests.post(player.url, data=json.dumps(snapshot))
-            self.apply_player_move(player, response.json().move)
+            self._set_snake_message(player.id, response.json().message)
+            should_kill = self.apply_player_move(player, response.json().move)
+            if should_kill:
+                to_kill.append(player.id)
 
         # 1: find collisions
         for x in range(0, len(self.document.width)):
