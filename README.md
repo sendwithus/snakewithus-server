@@ -7,7 +7,7 @@ snakewithus-server
 
 called with the client joins a new game
 
-### request body
+request body
 
 ```json
 {
@@ -21,7 +21,7 @@ called with the client joins a new game
 }
 ```
 
-### expected response
+expected response
 
 ```json
 {
@@ -33,7 +33,7 @@ called with the client joins a new game
 ## start
 called at the start of a game
 
-### request body
+request body
 
 ```json
 {
@@ -41,7 +41,7 @@ called at the start of a game
 }
 ```
 
-### expected response
+expected response
 
 ```json
 {}
@@ -50,7 +50,7 @@ called at the start of a game
 ## end
 called at the end of a game
 
-### request body
+request body
 
 ```json
 {
@@ -58,7 +58,7 @@ called at the end of a game
 }
 ```
 
-### expected response
+expected response
 
 ```json
 {}
@@ -73,14 +73,7 @@ called at every game tick
 }
 ```
 
-```json
-square: {
-    type: "snake|food|snake_head",
-    id: "snake id or null"
-}
-```
-
-### expected response
+expected response
 
 ```json
 {
@@ -153,3 +146,13 @@ called by ui at tick
     turn_num: 0
 }
 ```
+
+## Game square object
+
+```json
+square: {
+    type: "snake|food|snake_head",
+    id: "snake id or null"
+}
+```
+
