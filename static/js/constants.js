@@ -1,6 +1,6 @@
 window.snakewithus = {
   MOVE_DELTA: 1000,
-  SQUARE_SIZE: 60,
+  SQUARE_SIZE: 50,
   SQUARE_PADDING: 4,
   FOOD_PROBABILITY: 0.005,
   SQUARE_TYPES: {

@@ -7,7 +7,24 @@ $(function() {
   // var test_board = board.genBoard(20, 20);
   // sample_board_data.board = test_board;
 
-  board.update(sample_board_data);
+  board.init(sample_board_data);
+
+  $.ajax({
+    type: 'POST',
+    contentType: 'application/json',
+    dataType: 'json',
+    url: 'startwithconfig',
+    data: JSON.stringify({
+      player_urls: [
+        'http://example-snake.herokuapp.com/'
+      ],
+      local_player: false,
+      width: board.dimensions[0],
+      height: board.dimensions[1]
+    })
+  }).done(function(gameState) {
+    board.kick(gameState);
+  });
 });
 
 sample_board_data = {

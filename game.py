@@ -79,7 +79,7 @@ class Game(object):
             }
         return snakes
 
-    def _gen_initial_board(self, players, width, height):
+    def _gen_initial_board(self, players, widtth, height):
         board = []
         for x in range(0, 100):
             board[x] = []
@@ -87,10 +87,10 @@ class Game(object):
                 board[x].append([])
 
         for player in players:
-            start_pos = player.queue[0]
+            start_pos = player[ 'queue' ][0]
             board[start_pos[0]][start_pos[1]].append({
                 'type': 'head',
-                'id': player.id
+                'id': player['id']
             })
         return board
 
@@ -105,7 +105,7 @@ class Game(object):
 
     def _fetch_game(self):
         db = self._get_mongo_collection()
-        search = db.find({id: self.game_id})
+        search = db.find({'id': self.game['id']})
         if len(search) != 1:
             return None
 
@@ -120,15 +120,15 @@ class Game(object):
         pass
 
     def apply_player_move(self, player, move):
-        coords = player.queue[-1]  # head
+        coords = player[ 'queue' ][-1]  # head
         x = coords[0]
         y = coords[1]
 
         # snake moves forward, change snake_head to snake
-        board = self.document.state.board
+        board = self.document['state']['board']
         for obj in board[x][y]:
-            if obj.id == player.id:
-                obj.type = 'snake'
+            if obj['id'] == player['id']:
+                obj['type'] = 'snake'
 
         # update player queue and board state with new head
         if move == 'n':
@@ -160,81 +160,82 @@ class Game(object):
 
     def _give_food(self, snake_id):
         # give food to this snake
-        for snake in self.document.state.snakes:
-            if snake.id == snake_id:
+        for snake in self.document['state']['snakes']:
+            if snake['id'] == snake_id:
                 snake.stats.food += 1
                 return
 
     def _give_kill(self, snake_id):
         # give kills to this snake
-        for snake in self.document.state.snakes:
-            if snake.id == snake_id:
+        for snake in self.document['state']['snakes']:
+            if snake['id'] == snake_id:
                 snake.stats.kills += 1
                 return
 
     def _set_snake_message(self, snake_id, message):
-        for snake in self.document.state.snakes:
-            if snake.id == snake_id:
+        for snake in self.document['state']['snakes']:
+            if snake['id'] == snake_id:
                 snake.messages = message
                 return
 
     def tick(self):
-        snapshot = self.document.state.copy()
+        snapshot = self.document['state'].copy()
 
         to_kill = []
-        for player in self.document.players:
-            response = requests.post(player.url, data=json.dumps(snapshot))
-            self._set_snake_message(player.id, response.json().message)
+        for player in self.document['players']:
+            response = requests.post(player['url'], data=json.dumps(snapshot))
+            self._set_snake_message(player['id'], response.json().message)
             should_kill = self.apply_player_move(player, response.json().move)
+
             if should_kill:
-                to_kill.append(player.id)
+                to_kill.append(player['id'])
 
         # 1: find collisions
-        for x in range(0, len(self.document.width)):
-            for y in range(0, len(self.document.height)):
-                square = self.document.state.board[x][y]
+        for x in range(0, len(self.document['width'])):
+            for y in range(0, len(self.document['height'])):
+                square = self.document['state']['board'][x][y]
 
                 if len(square) == 2:
                     first = square[0]
                     second = square[1]
 
-                    if first.type == 'food' or second.type == 'food':
+                    if first['type'] == 'food' or second['type'] == 'food':
                         # snake food collision
-                        if first.type == 'food':
-                            self._give_food(second.id)
+                        if first['type'] == 'food':
+                            self._give_food(second['id'])
                         else:
-                            self._give_food(first.id)
+                            self._give_food(first['id'])
                     else:
                         for thing in square:
                             # kill all the non food
-                            if thing.type == 'snake_head':
-                                to_kill.append(thing.id)
-                            elif thing.type == 'snake':
-                                self._give_kill(thing.id)
+                            if thing['type'] == 'snake_head':
+                                to_kill.append(thing['id'])
+                            elif thing['type'] == 'snake':
+                                self._give_kill(thing['id'])
                 elif len(square) > 2:
                     for thing in square:
                         # kill all the non food
                         if thing.type == 'snake_head':
-                            to_kill.append(thing.id)
+                            to_kill.append(thing['id'])
                         elif thing.type == 'snake':
-                            self._give_kill(thing.id)
+                            self._give_kill(thing['id'])
 
         # 2: kill collisions
-        for snake in self.document.state.snakes:
-            if snake.id in to_kill:
+        for snake in self.document['state']['snakes']:
+            if snake['id'] in to_kill:
                 snake['status'] = 'dead'
 
-                for player in self.document.players:
-                    if player.id == snake.id:
-                        for position in player.queue:
+                for player in self.document['players']:
+                    if player['id'] == snake['id']:
+                        for position in player['queue']:
                             x = position[0]
                             y = position[1]
-                            square = self.document.state.board[x][y]
+                            square = self.document['state']['board'][x][y]
                             for thing in square:
-                                if thing.id == snake.id:
+                                if thing['id'] == snake['id']:
                                     square.remove(thing)
                                     break
                         break
 
     def get_state(self):
-        return self.document.state
+        return self.document['state']
