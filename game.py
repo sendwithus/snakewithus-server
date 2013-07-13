@@ -86,16 +86,21 @@ class Game(object):
             for y in range(0, height):
                 board[x].append([])
 
+        print 'created board: %s' % board
+
         for player in players:
-            start_pos = player[ 'queue' ][0]
-            board[start_pos[0]][start_pos[1]].append({
-                'type': 'head',
+            start_pos = player['queue'][0]
+            x = start_pos[0]
+            y = start_pos[1]
+            print 'got %s,%s' % (x,y)
+            board[x][y].append({
+                'type': 'snake_head',
                 'id': player['id']
             })
         return board
 
     def _gen_start_position(self, width, height):
-        return randint(0, width), randint(0, height)
+        return (randint(0, width), randint(0, height))
 
     def _gen_id(self):
         return uuid4().urn
@@ -109,7 +114,7 @@ class Game(object):
         if len(search) != 1:
             return None
 
-        self.document = search[0]
+        return search[0]
 
     def save(self):
         """saves game to mongo"""
@@ -191,8 +196,8 @@ class Game(object):
                 to_kill.append(player['id'])
 
         # 1: find collisions
-        for x in range(0, len(self.document['width'])):
-            for y in range(0, len(self.document['height'])):
+        for x in range(0, int(self.document['width'])):
+            for y in range(0, int(self.document['height'])):
                 square = self.document['state']['board'][x][y]
 
                 if len(square) == 2:
