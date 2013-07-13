@@ -81,7 +81,7 @@ class Game(object):
     def _gen_initial_board(self, players, width, height):
         board = []
         for x in range(0, width):
-            board[x] = []
+            board.append([])
             for y in range(0, height):
                 board[x].append([])
 
