@@ -62,6 +62,26 @@ class Game(object):
                 'height': height
             })
             self.document = db.find_one({"_id": id})
+
+
+            for player in self.document['players']:
+                data = {
+                    'game_id': self.game_id,
+                    'client_id': player['id'],
+                    'board': {
+                        'width': width,
+                        'height': height,
+                        'num_players': len(self.document['players'])
+                    }
+                }
+
+                response = requests.post(player['url'] + 'register', data=json.dumps(data))
+                back = response.json()
+                for snake in self.document['state']['snakes']:
+                    if snake['id'] == player['id']:
+                        snake['name'] = back['name']
+                        break
+
         else:
             self.document = self._fetch_game()
 
@@ -187,9 +207,10 @@ class Game(object):
 
         to_kill = []
         for player in self.document['players']:
-            response = requests.post(player['url'], data=json.dumps(snapshot))
-            self._set_snake_message(player['id'], response.json().message)
-            should_kill = self.apply_player_move(player, response.json().move)
+            response = requests.post(player['url'] + '/tick', data=json.dumps(snapshot))
+            print response.json()
+            self._set_snake_message(player['id'], response.json()['message'])
+            should_kill = self.apply_player_move(player, response.json()['move'])
 
             if should_kill:
                 to_kill.append(player['id'])
