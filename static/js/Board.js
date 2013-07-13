@@ -38,7 +38,7 @@ Board.prototype.yell = function(callback) {
     dataType: 'json',
     url: 'uidotick',
     data: JSON.stringify(data)
-  }).done(function(response) {
+  }).done(function(gameState) {
     callback(gameState);
   });
 };
@@ -52,6 +52,8 @@ Board.prototype.init = function(gameState) {
 Board.prototype.update = function(gameState) {
   this.gameState = gameState;
 
+  this.canvas.width = this.canvas.width;
+
   var boardData = gameState.board;
 
   for (var y=0; y<boardData.length; y++) {
@@ -61,7 +63,6 @@ Board.prototype.update = function(gameState) {
       this.drawSquare(x, y, square);
     }
   }
-  console.log('Board dimensions: ', this.boardDimensions);
 };
 
 Board.prototype.drawSquare = function(x, y, square) {
@@ -85,7 +86,7 @@ Board.prototype.drawSquare = function(x, y, square) {
   } else if (square_obj.type === snakewithus.SQUARE_TYPES.FOOD) {
     this.fillSquare(x, y, snakewithus.COLORS.FOOD);
   } else {
-    console.log('INVALID SQUARE TYPE', square_obj.type);
+    console.error('INVALID SQUARE TYPE', square_obj.type);
   }
 };
 
@@ -157,6 +158,5 @@ Board.prototype.genBoard = function(width, height) {
     }
     board.push(row);
   }
-  console.log('Generated new board', board);
   return board;
 };
