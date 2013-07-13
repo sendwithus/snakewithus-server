@@ -72,26 +72,36 @@ called at every game tick
     game_id: "unique-id-for-game",
     game_board: [
         [
-            [{}, {}, ...]
+            [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
+            [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
+            [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
         ], ...
     ],
-    snakes: {
-        snake_id: {
+    snakes: [
+        {
+            id: "id of snake",
             last_move: "",
             name: "name of snake",
-            facing: "n/e/s/w",
-            status: "status (dead/alive)"
-        }
-    },
+            facing: "n|e|s|w",
+            status: "dead|alive",
+            length: 1
+        }, ...
+    ],
     turn_num: 0
 }
 ```
+
+```json
+square: {
+    type: "snake|food|snake_head",
+    id: "snake id or null"
+}
 
 ### expected response
 
 ```json
 {
-    move: "n/e/s/w",
+    move: "n|e|s|w",
     message: ""
 }
 ```
