@@ -5,13 +5,14 @@ from bottle import route, run, static_file
 from bottle import get, post, request, response
 
 from settings import *
+from game import Game
 
 @get('/')
-def ui_index():
+def index():
     return static_file('index.html', root=STATIC_FILES_DIR)
 
 @post('/game/uistart')
-def ui_start_game():
+def start_game():
     """
     expects:
     {
@@ -21,19 +22,16 @@ def ui_start_game():
         local_player: true|false
     }
     """
-    response.content_type = 'application/json'
     data = request.json
 
-    # init game state
-    # return a game id
-    game_state = {
-        "id": uuid4().urn
-    }
+    game = Game(player_urls=data.player_urls, local_player=data.local_player)
+    game.save()
 
-    return dumps(game_state)
+    response.content_type = 'application/json'
+    return dumps(game.to_dict())
 
 @post('/game/tick')
-def ui_tick():
+def tick():
     """
     expects:
     {
