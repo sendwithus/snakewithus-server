@@ -48,7 +48,7 @@ class Game(object):
             # next setup inital game state
             state = {
                 'id': self.game_id,
-                'board': self._gen_initial_board(players),
+                'board': self._gen_initial_board(players, width, height),
                 'snakes': self._gen_snakes(players),
                 'turn_num': 0
             }
@@ -78,7 +78,7 @@ class Game(object):
             }
         return snakes
 
-    def _gen_initial_board(self, players=[]):
+    def _gen_initial_board(self, players, width, height):
         board = []
         for x in range(0, 100):
             board[x] = []
@@ -119,8 +119,7 @@ class Game(object):
         pass
 
     def apply_player_move(self, player, move):
-
-        coords = player.queue[len(player.queue) - 1]  # head
+        coords = player.queue[-1]  # head
         x = coords[0]
         y = coords[1]
 
@@ -156,9 +155,68 @@ class Game(object):
             if obj.id == player.id:
                 obj.pop(i)
 
+    def _give_food(snake_id):
+        # give food to this snake
+        for snake in self.document.state.snakes:
+            if snake.id == snake_id:
+                snake.stats.food += 1
+
+    def _give_kill(snake_id):
+        # give kills to this snake
+        for snake in self.document.state.snakes:
+            if snake.id == snake_id:
+                snake.stats.kills += 1
+        return
+
     def tick(self):
         snapshot = self.document.state.copy()
 
         for player in self.document.players:
             response = requests.post(player.url, data=json.dumps(snapshot))
             self.apply_player_move(player, response.json().move)
+
+        # 1: find collisions
+        to_kill = []
+        for x in range(0, len(self.document.width)):
+            for y in range(0, len(self.document.height)):
+                square = self.document.state.board[x][y]
+
+                if len(square) == 2:
+                    first = square[0]
+                    second = square[1]
+
+                    if first.type == 'food' or second.type == 'food':
+                        # snake food collision
+                        if first.type == 'food':
+                            _give_food(second.id)
+                        else:
+                            _give_food(first.id)
+                    else:
+                        for thing in square:
+                            # kill all the non food
+                            if thing.type == 'snake_head':
+                                to_kill.append(thing.id)
+                            elif thing.type == 'snake':
+                                _give_kill(thing.id)
+
+        # 2: kill collisions
+        for snake in self.document.state.snakes:
+            if snake.id in to_kill:
+                snake['status'] = 'dead'
+
+                for player in self.document.players:
+                    if player.id == snake.id:
+                        for position in player.queue:
+                            x = position[0]
+                            y = position[1]
+                            square = self.document.state.board[x][y]
+                            for thing in square:
+                                if thing.id == snake.id:
+                                    square.remove(thing)
+                                    break
+                        break
+
+    def get_state(self):
+        return self.document.state
+
+

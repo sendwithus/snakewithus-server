@@ -14,12 +14,12 @@ var Board = window.snakewithus.Board = function(ctx, canvas) {
   };
 
   var that = this;
-  // this.loop = setInterval( function() {
-  //   console.log('Yelling...');
-  //   that.yell( function(gameState) {
-  //     that.gameState = gameState;
-  //   });
-  // }, snakewithus.MOVE_DELTA);
+  this.loop = setInterval( function() {
+    console.log('Yelling...');
+    that.yell( function(gameState) {
+      that.gameState = gameState;
+    });
+  }, snakewithus.MOVE_DELTA);
 };
 
 Board.prototype.yell = function(callback) {
