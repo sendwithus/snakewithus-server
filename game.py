@@ -189,6 +189,8 @@ class Game(object):
         player['queue'].append((x, y))
         board[x][y].append({'type': 'snake_head', 'id': player['id']})
 
+        player['last_move'] = move
+
         if player['ate_last_turn']:
             player['ate_last_turn'] = False
         else:
@@ -280,6 +282,7 @@ class Game(object):
                                     square.remove(thing)
                                     break
                         break
+        self.document['state']['turn_num'] = int(self.document['state']['turn_num']) + 1
 
     def get_state(self):
         return self.document['state']
