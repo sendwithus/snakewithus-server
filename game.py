@@ -119,7 +119,7 @@ class Game(object):
         pass
 
     def apply_player_move(self, player, move):
-        coords = player.queue[len(player.queue) - 1]  # head
+        coords = player.queue[-1]  # head
         x = coords[0]
         y = coords[1]
 
