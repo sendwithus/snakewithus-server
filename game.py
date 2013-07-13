@@ -82,9 +82,9 @@ class Game(object):
 
     def _gen_initial_board(self, players, width, height):
         board = []
-        for x in range(0, width-1):
+        for x in range(0, width):
             board.append([])
-            for y in range(0, height-1):
+            for y in range(0, height):
                 board[x].append([])
 
         print 'created board: %s' % board
@@ -101,7 +101,7 @@ class Game(object):
         return board
 
     def _gen_start_position(self, width, height):
-        return (randint(0, width), randint(0, height))
+        return (randint(0, width-1), randint(0, height-1))
 
     def _gen_id(self):
         return uuid4().urn
