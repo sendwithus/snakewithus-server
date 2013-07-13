@@ -63,7 +63,7 @@ def tick():
     """
     data = request.json
 
-    game = Game(data['game_id'])
+    game = Game(game_id=data['game_id'])
 
     game.tick(local_player_move=data['local_player_move'])
     game.save()

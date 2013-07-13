@@ -111,7 +111,9 @@ class Game(object):
 
     def _fetch_game(self):
         db = self._get_mongo_collection()
-        return db.find_one({"id": self.game_id})
+        doc = db.find_one({"id": self.game_id})
+        print '%s -> %s' % (self.game_id, doc)
+        return doc
 
     def save(self):
         """saves game to mongo"""
