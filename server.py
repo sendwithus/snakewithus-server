@@ -4,9 +4,21 @@ from bottle import get, post, request, response
 from settings import *
 from game import Game
 
+
 @get('/')
 def index():
     return static_file('index.html', root=STATIC_FILES_DIR)
+
+
+@get('/js/<filename>')
+def server_js(filename):
+    return static_file(filename, root=STATIC_FILES_DIR+'/js')
+
+
+@get('/css/<filename>')
+def server_css(filename):
+    return static_file(filename, root=STATIC_FILES_DIR+'/css')
+
 
 @post('/startwithconfig')
 def start_game():
