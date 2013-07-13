@@ -7,9 +7,11 @@ from pymongo import MongoClient
 
 import settings
 
+
 def get_mongodb():
-	client = MongoClient(host=settings.MONGODB_URL)
-	return client[settings.MONGODB_DATABASE]
+    client = MongoClient(host=settings.MONGODB_URL)
+    return client[settings.MONGODB_DATABASE]
+
 
 class Game(object):
 
@@ -52,5 +54,36 @@ class Game(object):
         db.save(self.document)
 
     def tick(self):
+
+
+        snapshot = self.document.game_state
+        self.document.players = [
+            {
+                url 
+                name
+                id
+                queue: []
+                head_img_url
+            }
+        ]
+        
+        def apply_player_move(direction):
+            # update snapshot board object to reflect move
+
+
+        snapshot = self.document.game_state
+
+
+        # post to each client to obtain move
         for url in self.player_urls:
             response = requests.post(url)
+            # get dir and pass to apply_player_move
+
+        # resolve collisions / food
+
+
+
+        # update mongo store
+
+
+
