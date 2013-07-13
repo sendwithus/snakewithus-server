@@ -108,7 +108,7 @@ class Game(object):
         if len(search) != 1:
             return None
 
-        self.document = search[0]
+        return search[0]
 
     def save(self):
         """saves game to mongo"""
