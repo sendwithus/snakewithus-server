@@ -29,7 +29,7 @@ def start_game():
             height=data.height)
 
     response.content_type = 'application/json'
-    return dumps(game.to_dict())
+    return dumps(game.get_state())
 
 @post('/uidotick')
 def tick():
@@ -47,7 +47,7 @@ def tick():
     game.tick(local_player_move=data.local_player_move)
 
     response.content_type = 'application/json'
-    return dumps(game.to_dict())
+    return dumps(game.get_state())
 
 run(host='localhost', port=8080)
 

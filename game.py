@@ -195,4 +195,7 @@ class Game(object):
                                     break
                         break
 
+    def get_state(self):
+        return self.document.state
+
 
