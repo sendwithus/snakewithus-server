@@ -1,3 +1,4 @@
+import json
 import requests
 
 from uuid import uuid4
@@ -13,8 +14,9 @@ class Game(object):
             pass
             # hit datastore and pull game data for id
         self.player_urls = []
-        self.local_player = None
+        self.local_player = False
 
     def tick(self):
         for url in self.player_urls:
-            response = requests.post()
+            response = requests.post(url)
+            
