@@ -1,7 +1,7 @@
 import json
 import requests
 from random import randint
-from u['id'] import u['id']4
+from uuid import uuid4
 
 from pymongo import MongoClient
 
@@ -18,7 +18,7 @@ class Game(object):
     document = None
     _MONGODB_COLLECTION_NAME = 'snakewithus'
 
-    def __init__(self, game['id']=None, player_urls=None, local_player=None,
+    def __init__(self, game_id=None, player_urls=None, local_player=None,
             width=None, height=None):
         self._mongodb = get_mongodb()
         db = self._get_mongo_collection()
