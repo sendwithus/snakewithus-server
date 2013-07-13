@@ -155,13 +155,13 @@ class Game(object):
             if obj.id == player.id:
                 obj.pop(i)
 
-    def _give_food(snake_id):
+    def _give_food(self, snake_id):
         # give food to this snake
         for snake in self.document.state.snakes:
             if snake.id == snake_id:
                 snake.stats.food += 1
 
-    def _give_kill(snake_id):
+    def _give_kill(self, snake_id):
         # give kills to this snake
         for snake in self.document.state.snakes:
             if snake.id == snake_id:
@@ -188,23 +188,23 @@ class Game(object):
                     if first.type == 'food' or second.type == 'food':
                         # snake food collision
                         if first.type == 'food':
-                            _give_food(second.id)
+                            self._give_food(second.id)
                         else:
-                            _give_food(first.id)
+                            self._give_food(first.id)
                     else:
                         for thing in square:
                             # kill all the non food
                             if thing.type == 'snake_head':
                                 to_kill.append(thing.id)
                             elif thing.type == 'snake':
-                                _give_kill(thing.id)
+                                self._give_kill(thing.id)
                 elif len(square) > 2:
                     for thing in square:
                         # kill all the non food
                         if thing.type == 'snake_head':
                             to_kill.append(thing.id)
                         elif thing.type == 'snake':
-                            _give_kill(thing.id)
+                            self._give_kill(thing.id)
 
         # 2: kill collisions
         for snake in self.document.state.snakes:
@@ -225,5 +225,3 @@ class Game(object):
 
     def get_state(self):
         return self.document.state
-
-
