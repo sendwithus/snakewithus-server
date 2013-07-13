@@ -68,6 +68,7 @@ class Game(object):
         # copy players
         snakes = list(players)
         for player in snakes:
+            player['ate_last_turn'] = False
             player['last_move'] = ''
             player['name'] = ''
             player['status'] = 'alive'
@@ -136,34 +137,30 @@ class Game(object):
 
         # update player queue and board state with new head
         if move == 'n':
-            if player['last_move'] == 's':
-                return True
             y = y + 1
         elif move == 'e':
-            if player['last_move'] == 'w':
-                return True
             x = x + 1
         elif move == 's':
-            if player['last_move'] == 'n':
-                return True
             y = y - 1
         elif move == 'w':
-            if player['last_move'] == 'e':
-                return True
             x = x - 1
 
-        player[ 'queue' ].append((x, y))
-        board[x][y].append({'type': 'snake_head', 'id': player['id']})
-
-        # remove tail from player and game board
-        tail = player[ 'queue' ].pop(0)
-        square = board[tail[0]][tail[1]]
-        for obj in square:
-            if obj['id'] == player['id']:
-                square.remove(obj)
-
-        if x > self.document['width'] or x < 0 or y < 0 or y > self.document['height']:
+        if x > self.document['width'] - 1 or x < 0 or y < 0 or y > self.document['height'] - 1:
             return True
+
+        player['queue'].append((x, y))
+        board[x][y].append({type: 'snake_head', id: player['id']})
+
+        if player['ate_last_turn']:
+            player['ate_last_turn'] = False
+        else:
+            # remove tail from player and game board
+            tail = player['queue'].pop(0)
+            square = board[tail[0]][tail[1]]
+            for obj in square:
+                if obj['id'] == player['id']:
+                    square.remove(obj)
+
         return False
 
     def _give_food(self, snake_id):
