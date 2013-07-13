@@ -23,7 +23,8 @@ $(function() {
       height: board.dimensions[1]
     })
   }).done(function(gameState) {
-    board.kick(gameState);
+    board.update(gameState);
+    board.kick();
   });
 });
 
