@@ -187,7 +187,7 @@ class Game(object):
             return True
 
         player['queue'].append((x, y))
-        board[x][y].append({type: 'snake_head', id: player['id']})
+        board[x][y].append({'type': 'snake_head', 'id': player['id']})
 
         if player['ate_last_turn']:
             player['ate_last_turn'] = False
@@ -218,7 +218,7 @@ class Game(object):
     def _set_snake_message(self, snake_id, message):
         for snake in self.document['state']['snakes']:
             if snake['id'] == snake_id:
-                snake.messages = message
+                snake[ 'messages' ] = message
                 return
 
     def tick(self, local_player_move):
@@ -259,9 +259,9 @@ class Game(object):
                 elif len(square) > 2:
                     for thing in square:
                         # kill all the non food
-                        if thing.type == 'snake_head':
+                        if thing[ 'type' ] == 'snake_head':
                             to_kill.append(thing['id'])
-                        elif thing.type == 'snake':
+                        elif thing[ 'type' ] == 'snake':
                             self._give_kill(thing['id'])
 
         # 2: kill collisions
