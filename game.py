@@ -15,19 +15,24 @@ class Game(object):
     document = None
     _MONGODB_COLLECTION_NAME = 'snakewithus'
 
-    def __init__(self, game_id=None):
-        if not game_id:
+    def __init__(self, game_id=None, player_urls=None, local_player=None):
+        self._mongodb = get_mongodb()
+        db = self._get_mongo_collection()
+
+        self.created = False
+        self.game_id = game_id
+
+        if not self.game_id:
             self.game_id = uuid4().urn
             self.created = True
-            # handle creation and insertion to datastore
+
+            document = db.insert({
+                id: self.game_id,
+                player_urls: player_urls,
+                local_player:local_player
+            })
         else:
-            pass
-            # hit datastore and pull game data for id
-
-        self.player_urls = []
-        self.local_player = None
-
-        self._mongodb = get_mongodb()
+            self.document = self._fetch_game()
 
     def _get_mongo_collection(self):
         return self._mongodb[self._MONGODB_COLLECTION_NAME]
