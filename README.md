@@ -137,6 +137,7 @@ called by ui at tick
             name: "name of snake",
             facing: "n|e|s|w",
             status: "dead|alive",
+            message: "",
             points: {
                 kills: 0,
                 food: 0,
