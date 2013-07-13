@@ -119,12 +119,12 @@ class Game(object):
 
     def _client_request(self, player, path, data):
         headers = {'Content-type': 'application/json'}
-        response = requests.post(player['url'] + path, data=json.dumps(data), headers=headers)
+        r = requests.post(player['url'] + path, data=json.dumps(data), headers=headers)
 
         try:
-            back = response.json()
+            back = r.json()
         except Exception as e:
-            print 'Error reading player response: %s - %s' % (response, r.text)
+            print 'Error reading player response: %s - %s' % (r, r.text)
             back = None
         return back
 
