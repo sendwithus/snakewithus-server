@@ -79,11 +79,11 @@ class Game(object):
             }
         return snakes
 
-    def _gen_initial_board(self, players, widtth, height):
+    def _gen_initial_board(self, players, width, height):
         board = []
-        for x in range(0, 100):
-            board[x] = []
-            for y in range(0, 100):
+        for x in range(0, width):
+            board.append([])
+            for y in range(0, height):
                 board[x].append([])
 
         for player in players:
