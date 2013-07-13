@@ -1,5 +1,8 @@
-from bottle import route, run, static_file
-from bottle import get, post, request, response
+# Required to make bottle work with gevent
+import gevent.monkey
+gevent.monkey.patch_all()
+
+from bottle import debug, get, post, request, response, run, static_file
 
 from settings import *
 from game import Game
@@ -36,14 +39,14 @@ def start_game():
     data = request.json
 
     game = Game(
-        player_urls=data.player_urls,
-        local_player=data.local_player,
-        width=data.width,
-        height=data.height
+        player_urls=data['player_urls'],
+        local_player=data['local_player'],
+        width=data['width'],
+        height=data['height']
     )
 
     response.content_type = 'application/json'
-    return dumps(game.to_dict())
+    return dumps(game.get_state())
 
 
 @post('/uidotick')
@@ -64,4 +67,17 @@ def tick():
     response.content_type = 'application/json'
     return dumps(game)
 
-run(host='localhost', port=8080)
+    return dumps(game.get_state())
+
+
+## Run Bottle Server ##
+if __name__ == '__main__':
+    prod_port = os.environ.get('PORT', None)
+
+    if prod_port:
+        # Assume Heroku
+        run(host='0.0.0.0', port=int(prod_port), server='gevent')
+    else:
+        # Localhost
+        debug(True)
+        run(host='localhost', port=8080)
