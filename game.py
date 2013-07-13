@@ -100,7 +100,7 @@ class Game(object):
         return board
 
     def _gen_start_position(self, width, height):
-        return randint(0, width), randint(0, height)
+        return (randint(0, width), randint(0, height))
 
     def _gen_id(self):
         return uuid4().urn
