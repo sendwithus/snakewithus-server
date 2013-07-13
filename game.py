@@ -74,27 +74,14 @@ class Game(object):
 
     def tick(self):
 
+        snapshot = self.document.state.copy()
 
-        snapshot = self.document.game_state
-        self.document.players = [
-            {
-                url 
-                name
-                id
-                queue: []
-                head_img_url
-            }
-        ]
-        
         def apply_player_move(direction):
             # update snapshot board object to reflect move
-
-
-        snapshot = self.document.game_state
-
+            pass
 
         # post to each client to obtain move
-        for url in self.player_urls:
+        for player in self.document.players:
             response = requests.post(url)
             # get dir and pass to apply_player_move
 
