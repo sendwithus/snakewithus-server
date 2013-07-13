@@ -131,18 +131,26 @@ class Game(object):
 
         # update player queue and board state with new head
         if move == 'n':
+            if player['last_move'] == 's':
+                return True
             y = y + 1
             player.queue.append((x, y))
             board[x][y].append({type: 'snake_head', id: player.id})
         elif move == 'e':
+            if player['last_move'] == 'w':
+                return True
             x = x + 1
             player.queue.append((x, y))
             board[x][y].append({type: 'snake_head', id: player.id})
         elif move == 's':
+            if player['last_move'] == 'n':
+                return True
             y = y - 1
             player.queue.append((x, y))
             board[x][y].append({type: 'snake_head', id: player.id})
         elif move == 'w':
+            if player['last_move'] == 'e':
+                return True
             x = x - 1
             player.queue.append((x, y))
             board[x][y].append({type: 'snake_head', id: player.id})
