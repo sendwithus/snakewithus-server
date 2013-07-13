@@ -48,6 +48,10 @@ def start_game():
         height=data['height']
     )
 
+    game.do_client_register()
+    
+    game.do_client_start()
+
     response.content_type = 'application/json'
     return json.dumps(game.get_state())
 

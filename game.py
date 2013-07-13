@@ -64,24 +64,6 @@ class Game(object):
             self.document = db.find_one({"_id": id})
 
 
-            for player in self.document['players']:
-                data = {
-                    'game_id': self.game_id,
-                    'client_id': player['id'],
-                    'board': {
-                        'width': width,
-                        'height': height,
-                        'num_players': len(self.document['players'])
-                    }
-                }
-
-                response = requests.post(player['url'] + 'register', data=json.dumps(data))
-                back = response.json()
-                for snake in self.document['state']['snakes']:
-                    if snake['id'] == player['id']:
-                        snake['name'] = back['name']
-                        break
-
         else:
             self.document = self._fetch_game()
 
@@ -134,6 +116,41 @@ class Game(object):
         doc = db.find_one({"id": self.game_id})
         print '%s -> %s' % (self.game_id, doc)
         return doc
+
+    def _client_request(self, player, path, data):
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        response = requests.post(player['url'] + path, data=json.dumps(data), headers=headers)
+
+        try:
+            back = response.json()
+        except Exception as e:
+            print 'Error reading player response: %s - %s' % (response, r.text)
+            back = None
+        return back
+
+    def do_client_register(self):
+        for player in self.document['players']:
+            data = {
+                'game_id': self.game_id,
+                'client_id': player['id'],
+                'board': {
+                    'width': self.document['width'],
+                    'height': self.document['height'],
+                    'num_players': len(self.document['players'])
+                    }
+                }
+
+            back = self._client_request(player, 'register', data)
+
+            for snake in self.document['state']['snakes']:
+                if snake['id'] == player['id']:
+                    snake['name'] = back['name']
+                    break
+
+    def do_client_start(self):
+        for player in self.document['players']:
+            data = {'game_id': self.game_id}
+            back = self._client_request(player, 'start', data)
 
     def save(self):
         """saves game to mongo"""
@@ -207,10 +224,9 @@ class Game(object):
 
         to_kill = []
         for player in self.document['players']:
-            response = requests.post(player['url'] + '/tick', data=json.dumps(snapshot))
-            print response.json()
-            self._set_snake_message(player['id'], response.json()['message'])
-            should_kill = self.apply_player_move(player, response.json()['move'])
+            data = self._client_request(player, 'tick', snapshot)
+            self._set_snake_message(player['id'], data['message'])
+            should_kill = self.apply_player_move(player, data['move'])
 
             if should_kill:
                 to_kill.append(player['id'])
