@@ -171,12 +171,12 @@ class Game(object):
     def tick(self):
         snapshot = self.document.state.copy()
 
+        to_kill = []
         for player in self.document.players:
             response = requests.post(player.url, data=json.dumps(snapshot))
             self.apply_player_move(player, response.json().move)
 
         # 1: find collisions
-        to_kill = []
         for x in range(0, len(self.document.width)):
             for y in range(0, len(self.document.height)):
                 square = self.document.state.board[x][y]
@@ -198,6 +198,13 @@ class Game(object):
                                 to_kill.append(thing.id)
                             elif thing.type == 'snake':
                                 _give_kill(thing.id)
+                elif len(square) > 2:
+                    for thing in square:
+                        # kill all the non food
+                        if thing.type == 'snake_head':
+                            to_kill.append(thing.id)
+                        elif thing.type == 'snake':
+                            _give_kill(thing.id)
 
         # 2: kill collisions
         for snake in self.document.state.snakes:
