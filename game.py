@@ -40,7 +40,7 @@ class Game(object):
                 player = {
                     'url': url,
                     'id': self._gen_id(),
-                    queue: [self._gen_start_position(width, height)]
+                    'queue': [self._gen_start_position(width, height)]
                 }
 
                 players.append(player)
@@ -48,7 +48,7 @@ class Game(object):
             # next setup inital game state
             state = {
                 'id': self.game_id,
-                'board': self._gen_initial_board(players),
+                'board': self._gen_initial_board(players, width, height),
                 'snakes': self._gen_snakes(players),
                 'turn_num': 0
             }
@@ -79,7 +79,7 @@ class Game(object):
             }
         return snakes
 
-    def _gen_initial_board(self, players=[]):
+    def _gen_initial_board(self, players, width, height):
         board = []
         for x in range(0, 100):
             board[x] = []
