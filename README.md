@@ -13,6 +13,11 @@ called with the client joins a new game
 {
     game_id: "unique-id-for-game",
     client_id: "unique-id-server-generated-for-client",
+    board: {
+        width: "width",
+        height: "height",
+        num_players: 0
+    }
 }
 ```
 
@@ -26,18 +31,13 @@ called with the client joins a new game
 ```
 
 ## start
-
-called when a new game is started
+called at the start of a game
 
 ### request body
 
 ```json
 {
-    game_id: "unique-id-for-game",
-    board_size: {
-        width: "width",
-        height: "height"
-    }
+    game_id: "unique-id-for-game"
 }
 ```
 
@@ -75,16 +75,24 @@ called at every game tick
             [{}, {}, ...]
         ], ...
     ],
-    snake_status: {
-        snake_id: "status (dead/alive)"
+    snakes: {
+        snake_id: {
+            last_move: "",
+            name: "name of snake",
+            facing: "n/e/s/w",
+            status: "status (dead/alive)"
+        }
     },
-    tick_ts: "timestamp for tick"
+    turn_num: 0
 }
 ```
 
 ### expected response
 
 ```json
-{}
+{
+    move: "n/e/s/w",
+    message: ""
+}
 ```
 
