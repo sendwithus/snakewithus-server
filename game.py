@@ -36,26 +36,18 @@ class Game(object):
             if not player_urls:
                 player_urls = []
 
-            for url in player_urls:
-                player = {
-                    'url': url,
-                    'id': self._gen_id(),
-                    'queue': [self._gen_start_position(width, height)]
-                }
-
-                players.append(player)
+            snakes = self._gen_snakes(player_urls, width, height)
 
             # next setup inital game state
             state = {
                 'id': self.game_id,
-                'board': self._gen_initial_board(players, width, height),
-                'snakes': self._gen_snakes(players),
+                'board': self._gen_initial_board(snakes, width, height),
+                'snakes': snakes,
                 'turn_num': 0
             }
 
             id  = db.insert({
                 'id': self.game_id,
-                'players': players,
                 'local_player': local_player,
                 'state': state,
                 'width': width,
@@ -63,14 +55,17 @@ class Game(object):
             })
             self.document = db.find_one({"_id": id})
 
-
         else:
             self.document = self._fetch_game()
 
-    def _gen_snakes(self, players=[]):
-        # copy players
-        snakes = list(players)
-        for player in snakes:
+    def _gen_snakes(self, player_url, width, height):
+        snakes = []
+        for url in player_urls:
+            player = {
+                'url': url,
+                'id': self._gen_id(),
+                'queue': [self._gen_start_position(width, height)]
+            }
             player['ate_last_turn'] = False
             player['last_move'] = ''
             player['name'] = ''
@@ -80,6 +75,7 @@ class Game(object):
                 'kills': 0,
                 'food': 0
             }
+            snakes.append(player)
         return snakes
 
     def _gen_initial_board(self, players, width, height):
@@ -126,26 +122,23 @@ class Game(object):
         return back
 
     def do_client_register(self):
-        for player in self.document['players']:
+        for snake in self.document['state']['snakes']:
             data = {
                 'game_id': self.game_id,
-                'client_id': player['id'],
+                'client_id': snake['id'],
                 'board': {
                     'width': self.document['width'],
                     'height': self.document['height'],
-                    'num_players': len(self.document['players'])
+                    'num_players': len(self.document['state']['snakes'])
                     }
                 }
 
-            back = self._client_request(player, 'register', data)
+            back = self._client_request(snake, 'register', data)
 
-            for snake in self.document['state']['snakes']:
-                if snake['id'] == player['id']:
-                    snake['name'] = back['name']
-                    break
+            snake['name'] = back['name']
 
     def do_client_start(self):
-        for player in self.document['players']:
+        for player in self.document['state']['snakes']:
             data = {'game_id': self.game_id}
             back = self._client_request(player, 'start', data)
 
@@ -208,30 +201,24 @@ class Game(object):
         # give food to this snake
         for snake in self.document['state']['snakes']:
             if snake['id'] == snake_id:
-                snake.stats.food += 1
+                snake['stats']['food'] += 1
                 return
 
     def _give_kill(self, snake_id):
         # give kills to this snake
         for snake in self.document['state']['snakes']:
             if snake['id'] == snake_id:
-                snake.stats.kills += 1
-                return
-
-    def _set_snake_message(self, snake_id, message):
-        for snake in self.document['state']['snakes']:
-            if snake['id'] == snake_id:
-                snake[ 'messages' ] = message
+                snake['stats']['kills'] += 1
                 return
 
     def tick(self, local_player_move):
         snapshot = self.document['state'].copy()
 
         to_kill = []
-        for player in self.document['players']:
+        for player in self.document['state']['snakes']:
             path = 'tick/%s' % player['id']
             data = self._client_request(player, path, snapshot)
-            self._set_snake_message(player['id'], data['message'])
+            player['message'] = data['message']
             should_kill = self.apply_player_move(player, data['move'])
 
             if should_kill:
@@ -272,17 +259,14 @@ class Game(object):
             if snake['id'] in to_kill:
                 snake['status'] = 'dead'
 
-                for player in self.document['players']:
-                    if player['id'] == snake['id']:
-                        for position in player['queue']:
-                            x = position[0]
-                            y = position[1]
-                            square = self.document['state']['board'][x][y]
-                            for thing in square:
-                                if thing['id'] == snake['id']:
-                                    square.remove(thing)
-                                    break
-                        break
+                for position in snake['queue']:
+                    x = position[0]
+                    y = position[1]
+                    square = self.document['state']['board'][x][y]
+                    for thing in square:
+                        if thing['id'] == snake['id']:
+                            square.remove(thing)
+                            break
         self.document['state']['turn_num'] = int(self.document['state']['turn_num']) + 1
 
     def get_state(self):
