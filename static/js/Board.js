@@ -16,8 +16,8 @@ var Board = window.snakewithus.Board = function(ctx, canvas) {
 
 Board.prototype.kick = function() {
   var that = this;
-  // this.loop = setInterval( function() {
-  this.loop = setTimeout( function() {
+  this.loop = setInterval( function() {
+  // this.loop = setTimeout( function() {
     console.log('Yelling...');
     that.yell( function(gameState) {
       that.gameState = gameState;
