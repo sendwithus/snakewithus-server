@@ -85,10 +85,15 @@ class Game(object):
             for y in range(0, height):
                 board[x].append([])
 
+        print 'created board: %s' % board
+
         for player in players:
-            start_pos = player[ 'queue' ][0]
-            board[start_pos[0]][start_pos[1]].append({
-                'type': 'head',
+            start_pos = player['queue'][0]
+            x = start_pos[0]
+            y = start_pos[1]
+            print 'got %s,%s' % (x,y)
+            board[x][y].append({
+                'type': 'snake_head',
                 'id': player['id']
             })
         return board
@@ -194,8 +199,8 @@ class Game(object):
                 to_kill.append(player['id'])
 
         # 1: find collisions
-        for x in range(0, len(self.document['width'])):
-            for y in range(0, len(self.document['height'])):
+        for x in range(0, int(self.document['width'])):
+            for y in range(0, int(self.document['height'])):
                 square = self.document['state']['board'][x][y]
 
                 if len(square) == 2:

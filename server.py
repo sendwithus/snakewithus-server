@@ -2,6 +2,8 @@
 import gevent.monkey
 gevent.monkey.patch_all()
 
+from json import dumps
+
 from bottle import debug, get, post, request, response, run, static_file
 
 from settings import *
