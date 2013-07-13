@@ -26,16 +26,35 @@ class Game(object):
         self.game_id = game_id
 
         if not self.game_id:
-            self.game_id = uuid4().urn
+            self.game_id = self._gen_id()
             self.created = True
+            players = []
+
+            if not player_urls:
+                player_urls = []
+
+            for url in player_urls:
+                player = {
+                    'url': url,
+                    'id': self._gen_id(),
+                    'name': '',
+                    'head_img_url': '',
+                    queue: []
+                }
+
+                players.append(player)
 
             document = db.insert({
-                id: self.game_id,
-                player_urls: player_urls,
-                local_player:local_player
+                'id': self.game_id,
+                'players': players,
+                'local_player': local_player,
+                'state': {}
             })
         else:
             self.document = self._fetch_game()
+
+    def _gen_id(self):
+        return uuid4().urn
 
     def _get_mongo_collection(self):
         return self._mongodb[self._MONGODB_COLLECTION_NAME]
