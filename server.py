@@ -1,5 +1,6 @@
 # Required to make bottle work with gevent
 import gevent.monkey
+import json
 gevent.monkey.patch_all()
 
 from json import dumps
@@ -48,7 +49,7 @@ def start_game():
     )
 
     response.content_type = 'application/json'
-    return dumps(game.get_state())
+    return json.dumps(game.get_state())
 
 
 @post('/uidotick')
@@ -68,9 +69,8 @@ def tick():
     game.save()
 
     response.content_type = 'application/json'
-    return dumps(game)
 
-    return dumps(game.get_state())
+    return json.dumps(game.get_state())
 
 
 ## Run Bottle Server ##
