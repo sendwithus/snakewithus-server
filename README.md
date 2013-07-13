@@ -96,6 +96,7 @@ square: {
     type: "snake|food|snake_head",
     id: "snake id or null"
 }
+```
 
 ### expected response
 
