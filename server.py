@@ -39,13 +39,14 @@ def start_game():
     data = request.json
 
     game = Game(
-        player_urls=data.player_urls,
-        local_player=data.local_player,
-        width=data.width,
-        height=data.height)
+        player_urls=data['player_urls'],
+        local_player=data['local_player'],
+        width=data['width'],
+        height=data['height']
+    )
 
     response.content_type = 'application/json'
-    return dumps(game.to_dict())
+    return dumps(game.get_state())
 
 
 @post('/uidotick')
@@ -59,12 +60,14 @@ def tick():
     """
     data = request.json
 
-    game = Game(data.game_id)
+    game = Game(data['game_id'])
 
-    game.tick(local_player_move=data.local_player_move)
+    game.tick(local_player_move=data['local_player_move'])
 
     response.content_type = 'application/json'
-    return dumps(game.to_dict())
+    return dumps(game)
+
+    return dumps(game.get_state())
 
 
 ## Run Bottle Server ##
