@@ -1,3 +1,4 @@
+import json
 import requests
 from random import randint
 from uuid import uuid4
@@ -52,7 +53,7 @@ class Game(object):
                 'turn_num': 0
             }
 
-            document = db.insert({
+            self.document = db.insert({
                 'id': self.game_id,
                 'players': players,
                 'local_player': local_player,
@@ -69,7 +70,6 @@ class Game(object):
         for player in snakes:
             player['last_move'] = ''
             player['name'] = ''
-            player['facing'] = ''
             player['status'] = 'alive'
             player['message'] = ''
             player['points'] = {
@@ -123,16 +123,37 @@ class Game(object):
         x = coords[0]
         y = coords[1]
 
-        if move == 'n':
-            player.queue.append((x, y + 1))
-        elif move == 'e':
-            player.queue.append((x + 1, y))
-        elif move == 's':
-            player.queue.append((x, y - 1))
-        elif move == 'w':
-            player.queue.append((x - 1, y))
+        # snake moves forward, change snake_head to snake
+        board = self.document.state.board
+        for obj in board[x][y]:
+            if obj.id == player.id:
+                obj.type = 'snake'
 
-        player.queue.pop(0)  # remove the tail
+        # update player queue and board state with new head
+        if move == 'n':
+            y = y + 1
+            player.queue.append((x, y))
+            board[x][y].append({type: 'snake_head', id: player.id})
+        elif move == 'e':
+            x = x + 1
+            player.queue.append((x, y))
+            board[x][y].append({type: 'snake_head', id: player.id})
+        elif move == 's':
+            y = y - 1
+            player.queue.append((x, y))
+            board[x][y].append({type: 'snake_head', id: player.id})
+        elif move == 'w':
+            x = x - 1
+            player.queue.append((x, y))
+            board[x][y].append({type: 'snake_head', id: player.id})
+
+        # remove tail from player and game board
+        tail = player.queue.pop(0)
+        i = 0
+        for obj in board[tail[0]][tail[1]]:
+            i += 1
+            if obj.id == player.id:
+                obj.pop(i)
 
     def _give_food(snake_id):
         # give food to this snake
@@ -152,7 +173,7 @@ class Game(object):
 
         to_kill = []
         for player in self.document.players:
-            response = requests.post(player.url)
+            response = requests.post(player.url, data=json.dumps(snapshot))
             self.apply_player_move(player, response.json().move)
 
         # 1: find collisions
