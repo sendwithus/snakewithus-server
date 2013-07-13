@@ -30,6 +30,7 @@ Board.prototype.yell = function(callback) {
     game_id: this.gameState.id,
     local_player_move: false
   };
+  console.log('TICK', data);
 
   $.ajax({
     type: 'POST',
@@ -37,7 +38,7 @@ Board.prototype.yell = function(callback) {
     dataType: 'json',
     url: 'uidotick',
     data: JSON.stringify(data)
-  }).done(function( response ) {
+  }).done(function(response) {
     callback(gameState);
   });
 };
