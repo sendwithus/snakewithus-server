@@ -111,7 +111,7 @@ class Game(object):
 
     def _fetch_game(self):
         db = self._get_mongo_collection()
-        return db.find_one({"id": self.game['id']})
+        return db.find_one({"id": self.game_id})
 
     def save(self):
         """saves game to mongo"""
@@ -180,7 +180,7 @@ class Game(object):
                 snake.messages = message
                 return
 
-    def tick(self):
+    def tick(self, local_player_move):
         snapshot = self.document['state'].copy()
 
         to_kill = []
