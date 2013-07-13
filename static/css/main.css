@@ -1,0 +1,12 @@
+body { background: #333; }
+
+.board {
+  width: 100%;
+
+}
+
+canvas {
+  border: 10px solid #845FD7;
+  background: #222;
+  padding: 6px;
+}
