@@ -131,12 +131,20 @@ class Game(object):
 
         # update player queue and board state with new head
         if move == 'n':
+            if player['last_move'] == 's':
+                return True
             y = y + 1
         elif move == 'e':
+            if player['last_move'] == 'w':
+                return True
             x = x + 1
         elif move == 's':
+            if player['last_move'] == 'n':
+                return True
             y = y - 1
         elif move == 'w':
+            if player['last_move'] == 'e':
+                return True
             x = x - 1
 
         player.queue.append((x, y))
@@ -153,21 +161,21 @@ class Game(object):
             return True
         return False
 
-    def _give_food(snake_id):
+    def _give_food(self, snake_id):
         # give food to this snake
         for snake in self.document.state.snakes:
             if snake['id'] == snake_id:
                 snake.stats.food += 1
                 return
 
-    def _give_kill(snake_id):
+    def _give_kill(self, snake_id):
         # give kills to this snake
         for snake in self.document.state.snakes:
             if snake['id'] == snake_id:
                 snake.stats.kills += 1
                 return
 
-    def _set_snake_message(snake_id, message):
+    def _set_snake_message(self, snake_id, message):
         for snake in self.document.state.snakes:
             if snake['id'] == snake_id:
                 snake.messages = message
@@ -193,26 +201,26 @@ class Game(object):
                     first = square[0]
                     second = square[1]
 
-                    if first.type == 'food' or second.type == 'food':
+                    if first['type'] == 'food' or second['type'] == 'food':
                         # snake food collision
-                        if first.type == 'food':
-                            _give_food(second['id'])
+                        if first['type'] == 'food':
+                            self._give_food(second['id'])
                         else:
-                            _give_food(first['id'])
+                            self._give_food(first['id'])
                     else:
                         for thing in square:
                             # kill all the non food
-                            if thing.type == 'snake_head':
+                            if thing['type'] == 'snake_head':
                                 to_kill.append(thing['id'])
-                            elif thing.type == 'snake':
-                                _give_kill(thing['id'])
+                            elif thing['type'] == 'snake':
+                                self._give_kill(thing['id'])
                 elif len(square) > 2:
                     for thing in square:
                         # kill all the non food
                         if thing.type == 'snake_head':
                             to_kill.append(thing['id'])
                         elif thing.type == 'snake':
-                            _give_kill(thing['id'])
+                            self._give_kill(thing['id'])
 
         # 2: kill collisions
         for snake in self.document.state.snakes:
@@ -233,5 +241,3 @@ class Game(object):
 
     def get_state(self):
         return self.document.state
-
-
