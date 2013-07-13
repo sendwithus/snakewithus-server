@@ -69,25 +69,7 @@ called at every game tick
 
 ```json
 {
-    game_id: "unique-id-for-game",
-    game_board: [
-        [
-            [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
-            [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
-            [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
-        ], ...
-    ],
-    snakes: [
-        {
-            id: "id of snake",
-            last_move: "",
-            name: "name of snake",
-            facing: "n|e|s|w",
-            status: "dead|alive",
-            length: 1
-        }, ...
-    ],
-    turn_num: 0
+    game state object
 }
 ```
 
@@ -107,3 +89,67 @@ square: {
 }
 ```
 
+## startwithconfig
+called by ui to start game
+
+```json
+{
+    player_urls: [
+        'url to snake client endpoint', ...
+    ],
+    local_player: true|false
+}
+```
+
+### expected response
+
+```json
+{
+    game state object
+}
+```
+
+## uidotick
+called by ui at tick
+
+```json
+{
+    game_id: "unique-id-for-game",
+    local_player_move: "n|w|s|e"
+}
+```
+
+### expected response
+```json
+{
+    game state object
+}
+```
+
+## Game state object
+```json
+{
+    id: "unique-id-for-game",
+    board: [
+        [
+            [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
+            [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
+            [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
+        ], ...
+    ],
+    snakes: [
+        {
+            id: "id of snake",
+            last_move: "",
+            name: "name of snake",
+            facing: "n|e|s|w",
+            status: "dead|alive",
+            points: {
+                kills: 0,
+                food: 0,
+            }
+        }, ...
+    ],
+    turn_num: 0
+}
+```
