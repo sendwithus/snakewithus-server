@@ -1,4 +1,3 @@
-import json
 import requests
 from random import randint
 from uuid import uuid4
@@ -40,7 +39,7 @@ class Game(object):
                 player = {
                     'url': url,
                     'id': self._gen_id(),
-                    queue: [self._gen_start_position(width, height)]
+                    'queue': [self._gen_start_position(width, height)]
                 }
 
                 players.append(player)
@@ -48,7 +47,7 @@ class Game(object):
             # next setup inital game state
             state = {
                 'id': self.game_id,
-                'board': self._gen_initial_board(players),
+                'board': self._gen_initial_board(players, width, height),
                 'snakes': self._gen_snakes(players),
                 'turn_num': 0
             }
@@ -79,7 +78,7 @@ class Game(object):
             }
         return snakes
 
-    def _gen_initial_board(self, players=[]):
+    def _gen_initial_board(self, players, width, height):
         board = []
         for x in range(0, 100):
             board[x] = []
@@ -116,24 +115,28 @@ class Game(object):
         db = self._get_mongo_collection()
         db.save(self.document)
 
-    def tick(self):
+    def resolve_food(self):
+        pass
 
+    def apply_player_move(self, player, move):
+        coords = player.queue[-1]  # head
+        x = coords[0]
+        y = coords[1]
+
+        if move == 'n':
+            player.queue.append((x, y + 1))
+        elif move == 'e':
+            player.queue.append((x + 1, y))
+        elif move == 's':
+            player.queue.append((x, y - 1))
+        elif move == 'w':
+            player.queue.append((x - 1, y))
+
+        player.queue.pop(0)  # remove the tail
+
+    def tick(self):
         snapshot = self.document.state.copy()
 
-        def apply_player_move(direction):
-            # update snapshot board object to reflect move
-            pass
-
-        # post to each client to obtain move
         for player in self.document.players:
-            response = requests.post(url)
-            # get dir and pass to apply_player_move
-
-        # resolve collisions / food
-
-
-
-        # update mongo store
-
-
-
+            response = requests.post(player.url)
+            self.apply_player_move(player, response.json().move)
