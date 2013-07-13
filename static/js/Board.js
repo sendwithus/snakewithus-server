@@ -20,7 +20,7 @@ Board.prototype.kick = function() {
   // this.loop = setTimeout( function() {
     console.log('Yelling...');
     that.yell( function(gameState) {
-      that.gameState = gameState;
+      that.update(gameState);
     });
   }, snakewithus.MOVE_DELTA);
 };
