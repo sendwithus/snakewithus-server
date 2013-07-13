@@ -63,6 +63,7 @@ def tick():
     game = Game(data['game_id'])
 
     game.tick(local_player_move=data['local_player_move'])
+    game.save()
 
     response.content_type = 'application/json'
     return dumps(game)
