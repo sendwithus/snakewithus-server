@@ -180,7 +180,7 @@ class Game(object):
                 snake.stats.kills += 1
                 return
 
-    def _set_snake_message(snake_id, message):
+    def _set_snake_message(self, snake_id, message):
         for snake in self.document.state.snakes:
             if snake.id == snake_id:
                 snake.messages = message
