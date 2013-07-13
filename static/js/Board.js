@@ -4,7 +4,7 @@
 var Board = window.snakewithus.Board = function(ctx, canvas) {
   this.ctx = ctx;
   this.canvas = canvas;
-  this.boardDimensions = null;
+  this.dimensions = null;
   this.snakeCache = { };
   this.gameState = {
     id: 'None',
@@ -12,7 +12,9 @@ var Board = window.snakewithus.Board = function(ctx, canvas) {
     snakes: [ ],
     turn: 0
   };
+};
 
+Board.prototype.kick = function() {
   var that = this;
   // this.loop = setInterval( function() {
   this.loop = setTimeout( function() {
@@ -40,14 +42,13 @@ Board.prototype.yell = function(callback) {
   });
 };
 
-Board.prototype.update = function(gameState) {
-  if (!this.boardDimensions) {
-    // INIT
-    this.boardDimensions = this.getBoardDimensions(gameState.board);
-    this.canvas.width = snakewithus.SQUARE_SIZE * this.boardDimensions[0];
-    this.canvas.height = snakewithus.SQUARE_SIZE * this.boardDimensions[1];
-  }
+Board.prototype.init = function(gameState) {
+  this.dimensions = this.getBoardDimensions(gameState.board);
+  this.canvas.width = snakewithus.SQUARE_SIZE * this.dimensions[0];
+  this.canvas.height = snakewithus.SQUARE_SIZE * this.dimensions[1];
+};
 
+Board.prototype.update = function(gameState) {
   this.gameState = gameState;
 
   var boardData = gameState.board;
