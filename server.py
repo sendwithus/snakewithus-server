@@ -1,12 +1,27 @@
-from bottle import route, run, static_file
-from bottle import get, post, request, response
+# Required to make bottle work with gevent
+import gevent.monkey
+gevent.monkey.patch_all()
+
+from bottle import debug, get, post, request, response, run, static_file
 
 from settings import *
 from game import Game
 
+
 @get('/')
 def index():
     return static_file('index.html', root=STATIC_FILES_DIR)
+
+
+@get('/js/<filename>')
+def server_js(filename):
+    return static_file(filename, root=STATIC_FILES_DIR+'/js')
+
+
+@get('/css/<filename>')
+def server_css(filename):
+    return static_file(filename, root=STATIC_FILES_DIR+'/css')
+
 
 @post('/startwithconfig')
 def start_game():
@@ -23,13 +38,15 @@ def start_game():
     """
     data = request.json
 
-    game = Game(player_urls=data.player_urls,
-            local_player=data.local_player,
-            width=data.width,
-            height=data.height)
+    game = Game(
+        player_urls=data.player_urls,
+        local_player=data.local_player,
+        width=data.width,
+        height=data.height)
 
     response.content_type = 'application/json'
     return dumps(game.get_state())
+
 
 @post('/uidotick')
 def tick():
@@ -49,5 +66,15 @@ def tick():
     response.content_type = 'application/json'
     return dumps(game.get_state())
 
-run(host='localhost', port=8080)
 
+## Run Bottle Server ##
+if __name__ == '__main__':
+    prod_port = os.environ.get('PORT', None)
+
+    if prod_port:
+        # Assume Heroku
+        run(host='0.0.0.0', port=int(prod_port), server='gevent')
+    else:
+        # Localhost
+        debug(True)
+        run(host='localhost', port=8080)
