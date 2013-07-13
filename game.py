@@ -53,7 +53,7 @@ class Game(object):
                 'turn_num': 0
             }
 
-            self.document = db.insert({
+            id  = db.insert({
                 'id': self.game_id,
                 'players': players,
                 'local_player': local_player,
@@ -61,6 +61,7 @@ class Game(object):
                 'width': width,
                 'height': height
             })
+            self.document = db.find_one({"_id": id})
         else:
             self.document = self._fetch_game()
 
@@ -110,11 +111,7 @@ class Game(object):
 
     def _fetch_game(self):
         db = self._get_mongo_collection()
-        search = db.find({'id': self.game['id']})
-        if len(search) != 1:
-            return None
-
-        return search[0]
+        return db.find_one({"id": self.game['id']})
 
     def save(self):
         """saves game to mongo"""
