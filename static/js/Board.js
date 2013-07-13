@@ -14,7 +14,8 @@ var Board = window.snakewithus.Board = function(ctx, canvas) {
   };
 
   var that = this;
-  this.loop = setInterval( function() {
+  // this.loop = setInterval( function() {
+  this.loop = setTimeout( function() {
     console.log('Yelling...');
     that.yell( function(gameState) {
       that.gameState = gameState;
@@ -23,14 +24,19 @@ var Board = window.snakewithus.Board = function(ctx, canvas) {
 };
 
 Board.prototype.yell = function(callback) {
+  var data = {
+    game_id: this.gameState.id,
+    local_player_move: false
+  };
+
   $.ajax({
-    type: 'GET',
-    contentType: 'json',
+    type: 'POST',
+    contentType: 'application/json',
     dataType: 'json',
     url: 'uidotick',
-    success: function(gameState, txtStatus, jqXHR) {
-      callback(gameState);
-    }
+    data: JSON.stringify(data)
+  }).done(function( response ) {
+    callback(gameState);
   });
 };
 
