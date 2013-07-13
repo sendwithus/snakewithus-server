@@ -89,13 +89,12 @@ class Game(object):
             for y in range(0, height):
                 board[x].append([])
 
-        print 'created board: %s' % board
 
         for player in players:
             start_pos = player['queue'][0]
             x = start_pos[0]
             y = start_pos[1]
-            print 'got %s,%s' % (x,y)
+
             board[x][y].append({
                 'type': 'snake_head',
                 'id': player['id']
@@ -114,19 +113,15 @@ class Game(object):
     def _fetch_game(self):
         db = self._get_mongo_collection()
         doc = db.find_one({"id": self.game_id})
-        print '%s -> %s' % (self.game_id, doc)
         return doc
 
     def _client_request(self, player, path, data):
         headers = {'Content-type': 'application/json'}
         r = requests.post(player['url'] + path, data=json.dumps(data), headers=headers)
 
-        print 'Posting to client: %s\n%s' % (player['url'], path)
-
         try:
             back = r.json()
         except Exception as e:
-            print 'Error reading player response: %s - %s' % (r, r.text)
             back = None
         return back
 
@@ -166,6 +161,8 @@ class Game(object):
         coords = player[ 'queue' ][-1]  # head
         x = coords[0]
         y = coords[1]
+        old_x = x
+        old_y = y
 
         # snake moves forward, change snake_head to snake
         board = self.document['state']['board']
@@ -182,6 +179,10 @@ class Game(object):
             y = y - 1
         elif move == 'w':
             x = x - 1
+
+        print 'player moved: (%s,%s) -> (%s,%s)' % (
+                old_x, old_y, x, y
+                )
 
         if x > self.document['width'] - 1 or x < 0 or y < 0 or y > self.document['height'] - 1:
             return True
