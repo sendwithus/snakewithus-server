@@ -2,7 +2,6 @@
 # static settings
 
 import os
-import path
 
 here = os.path.dirname(os.path.dirname(__file__))
 
