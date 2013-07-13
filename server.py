@@ -22,7 +22,6 @@ def start_game():
     data = request.json
 
     game = Game(player_urls=data.player_urls, local_player=data.local_player)
-    game.save()
 
     response.content_type = 'application/json'
     return dumps(game.to_dict())
@@ -36,18 +35,14 @@ def tick():
         local_player_move: "n|w|s|e"
     }
     """
-    response.content_type = 'application/json'
     data = request.json
 
+    game = Game(data.game_id)
 
+    game.tick(local_player_move=data.local_player_move)
 
-    # init game state
-    # return a game id
-    game_state = {
-        "id": data.game_id
-    }
-
-    return dumps(game_state)
-
+    response.content_type = 'application/json'
+    return dumps(game.to_dict())
 
 run(host='localhost', port=8080)
+
