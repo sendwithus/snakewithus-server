@@ -1,3 +1,4 @@
+import json
 import requests
 
 from uuid import uuid4
@@ -50,7 +51,6 @@ class Game(object):
         db = self._get_mongo_collection()
         db.save(self.document)
 
-
     def tick(self):
-        for url in self.document.player_urls:
-            response = requests.post()
+        for url in self.player_urls:
+            response = requests.post(url)
