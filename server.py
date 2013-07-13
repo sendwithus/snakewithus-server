@@ -8,7 +8,7 @@ from game import Game
 def index():
     return static_file('index.html', root=STATIC_FILES_DIR)
 
-@post('/game/uistart')
+@post('/startwithconfig')
 def start_game():
     """
     expects:
@@ -16,18 +16,22 @@ def start_game():
         player_urls: [
             'url to snake client endpoint', ...
         ],
-        local_player: true|false
+        local_player: true|false,
+        width: 100,
+        height: 100
     }
     """
     data = request.json
 
-    game = Game(player_urls=data.player_urls, local_player=data.local_player)
-    game.save()
+    game = Game(player_urls=data.player_urls,
+            local_player=data.local_player,
+            width=data.width,
+            height=data.height)
 
     response.content_type = 'application/json'
     return dumps(game.to_dict())
 
-@post('/game/tick')
+@post('/uidotick')
 def tick():
     """
     expects:
@@ -36,18 +40,14 @@ def tick():
         local_player_move: "n|w|s|e"
     }
     """
-    response.content_type = 'application/json'
     data = request.json
 
+    game = Game(data.game_id)
 
+    game.tick(local_player_move=data.local_player_move)
 
-    # init game state
-    # return a game id
-    game_state = {
-        "id": data.game_id
-    }
-
-    return dumps(game_state)
-
+    response.content_type = 'application/json'
+    return dumps(game.to_dict())
 
 run(host='localhost', port=8080)
+

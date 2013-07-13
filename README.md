@@ -90,7 +90,9 @@ called by ui to start game
     player_urls: [
         'url to snake client endpoint', ...
     ],
-    local_player: true|false
+    local_player: true|false,
+    width: 100,
+    height: 100
 }
 ```
 
