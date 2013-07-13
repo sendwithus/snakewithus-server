@@ -121,6 +121,8 @@ class Game(object):
         headers = {'Content-type': 'application/json'}
         r = requests.post(player['url'] + path, data=json.dumps(data), headers=headers)
 
+        print 'Posting to client: %s\n%s' % (player['url'], path)
+
         try:
             back = r.json()
         except Exception as e:
@@ -224,7 +226,8 @@ class Game(object):
 
         to_kill = []
         for player in self.document['players']:
-            data = self._client_request(player, 'tick', snapshot)
+            path = 'tick/%s' % player['id']
+            data = self._client_request(player, path, snapshot)
             self._set_snake_message(player['id'], data['message'])
             should_kill = self.apply_player_move(player, data['move'])
 

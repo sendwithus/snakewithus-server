@@ -49,6 +49,8 @@ def start_game():
     )
 
     game.do_client_register()
+
+    game.save()
     
     game.do_client_start()
 
