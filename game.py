@@ -157,45 +157,46 @@ class Game(object):
             if obj['id'] == player['id']:
                 square.remove(obj)
 
-        if x > self.document.widtth or x < 0 or y < 0 or y > self.document.height:
+        if x > self.document['width'] or x < 0 or y < 0 or y > self.document['height']:
             return True
         return False
 
     def _give_food(self, snake_id):
         # give food to this snake
-        for snake in self.document.state.snakes:
+        for snake in self.document['state']['snakes']:
             if snake['id'] == snake_id:
                 snake.stats.food += 1
                 return
 
     def _give_kill(self, snake_id):
         # give kills to this snake
-        for snake in self.document.state.snakes:
+        for snake in self.document['state']['snakes']:
             if snake['id'] == snake_id:
                 snake.stats.kills += 1
                 return
 
     def _set_snake_message(self, snake_id, message):
-        for snake in self.document.state.snakes:
+        for snake in self.document['state']['snakes']:
             if snake['id'] == snake_id:
                 snake.messages = message
                 return
 
     def tick(self):
-        snapshot = self.document.state.copy()
+        snapshot = self.document['state'].copy()
 
         to_kill = []
-        for player in self.document.players:
+        for player in self.document['players']:
             response = requests.post(player['url'], data=json.dumps(snapshot))
             self._set_snake_message(player['id'], response.json().message)
             should_kill = self.apply_player_move(player, response.json().move)
+
             if should_kill:
                 to_kill.append(player['id'])
 
         # 1: find collisions
-        for x in range(0, len(self.document.width)):
-            for y in range(0, len(self.document.height)):
-                square = self.document.state.board[x][y]
+        for x in range(0, len(self.document['width'])):
+            for y in range(0, len(self.document['height'])):
+                square = self.document['state']['board'][x][y]
 
                 if len(square) == 2:
                     first = square[0]
@@ -223,16 +224,16 @@ class Game(object):
                             self._give_kill(thing['id'])
 
         # 2: kill collisions
-        for snake in self.document.state.snakes:
+        for snake in self.document['state']['snakes']:
             if snake['id'] in to_kill:
                 snake['status'] = 'dead'
 
-                for player in self.document.players:
+                for player in self.document['players']:
                     if player['id'] == snake['id']:
-                        for position in player.queue:
+                        for position in player['queue']:
                             x = position[0]
                             y = position[1]
-                            square = self.document.state.board[x][y]
+                            square = self.document['state']['board'][x][y]
                             for thing in square:
                                 if thing['id'] == snake['id']:
                                     square.remove(thing)
@@ -240,4 +241,4 @@ class Game(object):
                         break
 
     def get_state(self):
-        return self.document.state
+        return self.document['state']
