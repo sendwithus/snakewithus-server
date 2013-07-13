@@ -118,7 +118,7 @@ class Game(object):
         return doc
 
     def _client_request(self, player, path, data):
-        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        headers = {'Content-type': 'application/json'}
         response = requests.post(player['url'] + path, data=json.dumps(data), headers=headers)
 
         try:
