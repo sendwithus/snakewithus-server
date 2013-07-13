@@ -163,13 +163,20 @@ class Game(object):
         for snake in self.document.state.snakes:
             if snake.id == snake_id:
                 snake.stats.food += 1
+                return
 
     def _give_kill(snake_id):
         # give kills to this snake
         for snake in self.document.state.snakes:
             if snake.id == snake_id:
                 snake.stats.kills += 1
-        return
+                return
+
+    def _set_snake_message(snake_id, message):
+        for snake in self.document.state.snakes:
+            if snake.id == snake_id:
+                snake.messages = message
+                return
 
     def tick(self):
         snapshot = self.document.state.copy()
@@ -177,6 +184,7 @@ class Game(object):
         to_kill = []
         for player in self.document.players:
             response = requests.post(player.url, data=json.dumps(snapshot))
+            self._set_snake_message(player.id, response.json().message)
             should_kill = self.apply_player_move(player, response.json().move)
             if should_kill:
                 to_kill.append(player.id)
