@@ -104,7 +104,7 @@ class Game(object):
 
     def _fetch_game(self):
         db = self._get_mongo_collection()
-        search = db.find(['id']: self.game['id']})
+        search = db.find({'id': self.game['id']})
         if len(search) != 1:
             return None
 
