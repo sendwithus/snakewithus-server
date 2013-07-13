@@ -19,15 +19,15 @@ class Game(object):
     _MONGODB_COLLECTION_NAME = 'snakewithus'
 
     def __init__(self, game['id']=None, player_urls=None, local_player=None,
-            ['id']th=None, height=None):
+            width=None, height=None):
         self._mongodb = get_mongodb()
         db = self._get_mongo_collection()
 
         self.created = False
-        self.game['id'] = game['id']
+        self.game_id = game_id
 
-        if not self.game['id']:
-            self.game['id'] = self._gen['id']()
+        if not self.game_id:
+            self.game_id = self._gen_id()
             self.created = True
 
             # first setup our players
@@ -39,26 +39,26 @@ class Game(object):
             for url in player_urls:
                 player = {
                     'url': url,
-                    ['id']': self._gen['id'](),
-                    'queue': [self._gen_start_position(['id']th, height)]
+                    'id': self._gen_id(),
+                    'queue': [self._gen_start_position(width, height)]
                 }
 
                 players.append(player)
 
             # next setup inital game state
             state = {
-                ['id']': self.game['id'],
-                'board': self._gen_initial_board(players, ['id']th, height),
+                'id': self.game_id,
+                'board': self._gen_initial_board(players, width, height),
                 'snakes': self._gen_snakes(players),
                 'turn_num': 0
             }
 
             self.document = db.insert({
-                ['id']': self.game['id'],
+                'id': self.game_id,
                 'players': players,
                 'local_player': local_player,
                 'state': state,
-                '['id']th': ['id']th,
+                'width': width,
                 'height': height
             })
         else:
@@ -78,7 +78,7 @@ class Game(object):
             }
         return snakes
 
-    def _gen_initial_board(self, players, ['id']th, height):
+    def _gen_initial_board(self, players, widtth, height):
         board = []
         for x in range(0, 100):
             board[x] = []
@@ -89,15 +89,15 @@ class Game(object):
             start_pos = player.queue[0]
             board[start_pos[0]][start_pos[1]].append({
                 'type': 'head',
-                ['id']': player['id']
+                'id': player['id']
             })
         return board
 
-    def _gen_start_position(self, ['id']th, height):
-        return randint(0, ['id']th), randint(0, height)
+    def _gen_start_position(self, width, height):
+        return randint(0, width), randint(0, height)
 
-    def _gen['id'](self):
-        return u['id']4().urn
+    def _gen_id(self):
+        return uuid4().urn
 
     def _get_mongo_collection(self):
         return self._mongodb[self._MONGODB_COLLECTION_NAME]
@@ -124,7 +124,7 @@ class Game(object):
         y = coords[1]
 
         # snake moves forward, change snake_head to snake
-        board = self.document.state.board
+        board = self.document['state']['board']
         for obj in board[x][y]:
             if obj['id'] == player['id']:
                 obj['type'] = 'snake'
