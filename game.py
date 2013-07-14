@@ -131,13 +131,14 @@ class Game(object):
         r = requests.post(player['url'] + path, data=json.dumps(data), headers=headers)
 
         try:
-            back = r.json()
+            result = r.json()
         except Exception as e:
-            back = None
-        return back
+            result = None
+        return result
 
     def do_client_register(self):
-        for player in self.document['player']:
+        """Registers all the clients asynchronously"""
+        def client_register(player):
             data = {
                 'game_id': self.game_id,
                 'client_id': player['id'],
@@ -145,17 +146,31 @@ class Game(object):
                     'width': self.document['width'],
                     'height': self.document['height'],
                     'num_players': len(self.document['state']['snakes'])
-                    }
                 }
+            }
 
-            back = self._client_request(player, 'register', data)
+            response = {
+                'data': self._client_request(player, 'register', data),
+                'player_id': player['id']
+            }
 
-            snake['name'] = back['name']
+            return response
+
+        events = [gevent.spawn(client_register, player) for player in self.document['players']]
+        gevent.joinall(events)
+
+        for event in events:
+            player = self._get_snake(event.value['player_id'])
+            player['name'] = event.value['data']['name']
 
     def do_client_start(self):
-        for player in self.document['players']:
+        """Starts all the clients asynchronously"""
+        def client_start(player):
             data = {'game_id': self.game_id}
-            back = self._client_request(player, 'start', data)
+            return self._client_request(player, 'start', data)
+
+        events = [gevent.spawn(client_start, player) for player in self.document['players']]
+        gevent.joinall(events)
 
     def save(self):
         """saves game to mongo"""
@@ -293,14 +308,6 @@ class Game(object):
                 obj['type'] = 'snake'
                 return
 
-    def player_get_move(player, snapshot):
-        path = 'tick/%s' % player['id']
-        data = self._client_request(player, path, snapshot)
-        result = {
-            'player_id': player['id'],
-            'data': data,
-        }
-        return result
 
     def player_kill(player):
         print 'killing player: %s' % player['name']
@@ -319,9 +326,17 @@ class Game(object):
     def game_get_player_moves():
         snapshot = self.document['state'].copy()
 
-        moves = [gevent.spawn(self.player_get_move, player, snapshot) for player in self.document['state']['snakes']]
-        gevent.joinall(moves)
+        def get_player_move(player, snapshot):
+            path = 'tick/%s' % player['id']
+            data = self._client_request(player, path, snapshot)
+            result = {
+                'player_id': player['id'],
+                'data': data,
+            }
+            return result
 
+        moves = [gevent.spawn(get_player_move, player, snapshot) for player in self.document['players']]
+        gevent.joinall(moves)
         return moves
 
     def game_calculate_collisions(x, y):
