@@ -7,24 +7,77 @@ $(function() {
   // var test_board = board.genBoard(20, 20);
   // sample_board_data.board = test_board;
 
-  board.init(sample_board_data);
+  // board.init(sample_board_data);
 
-  $.ajax({
-    type: 'POST',
-    contentType: 'application/json',
-    dataType: 'json',
-    url: 'startwithconfig',
-    data: JSON.stringify({
-      player_urls: [
-        'http://example-snake.herokuapp.com/'
-      ],
-      local_player: false,
-      width: board.dimensions[0],
-      height: board.dimensions[1]
-    })
-  }).done(function(gameState) {
-    board.update(gameState);
-    board.kick();
+  var pollTimeout = null;
+
+  var $newGameButton   = $('#create-game');
+  var $startGameButton = $('#start-game');
+  var $fetchGameButton = $('#fetch-game');
+
+  var $gameIdContainer = $('#game-id');
+
+  /** NEW GAME **/
+  $newGameButton.on('click', function(e) {
+    e.preventDefault();
+
+    $.ajax({
+      type: 'POST',
+      contentType: 'application/json',
+      dataType: 'json',
+      url: '/game',
+      data: JSON.stringify({
+        width: 10,
+        height: 10,
+        local_player: false
+      })
+    }).done(function(gameState) {
+      $gameIdContainer.text(gameState.id);
+      board.init(gameState);
+      console.log('Initialized board:', board);
+
+      // WAIT FOR PLAYERS TO JOIN
+      pollTimeout = setInterval(fetchGameState, 800);
+    });
+  });
+
+  /** START GAME **/
+  $startGameButton.on('click', function(e) {
+    e.preventDefault();
+
+    // STOP POLLING FOR PLAYERS
+    clearTimeout(pollTimeout);
+
+    $.ajax({
+      type: 'PUT',
+      contentType: 'application/json',
+      dataType: 'json',
+      url: '/game.start/'+board.getGameId(),
+      data: JSON.stringify({
+        local_player: false,
+        width: board.dimensions[0],
+        height: board.dimensions[1]
+      })
+    }).done(function(gameState) {
+      board.update(gameState);
+      board.kick();
+    });
+  });
+
+  var fetchGameState = function() {
+    $.ajax({
+      type: 'GET',
+      dataType: 'json',
+      url: '/game/'+board.getGameId()
+    }).done(function(gameState) {
+      board.update(gameState);
+    });
+  };
+
+  /** FETCH GAME STATE **/
+  $fetchGameButton.on('click', function(e) {
+    e.preventDefault();
+    fetchGameState();
   });
 });
 

@@ -13,50 +13,53 @@ import settings
 
 
 def get_mongodb():
-    client = MongoClient(host=settings.MONGODB_URL)
+    if settings.MONGODB_URL:
+        client = MongoClient(host=settings.MONGODB_URL)
+    else:
+        client = MongoClient(host='localhost', port=27017)
+
     return client[settings.MONGODB_DATABASE]
 
 
 class Game(object):
 
     document = None
-    _MONGODB_COLLECTION_NAME = 'snakewithus'
+    _MONGODB_COLLECTION_NAME = 'games'
 
-    def __init__(self, game_id=None, player_urls=None, local_player=None,
-            width=None, height=None):
+    def __init__(self, game_id=None, local_player=None,
+            width=None, height=None
+        ):
         self._mongodb = get_mongodb()
         self.db = self._get_mongo_collection()
 
         self.created = False
 
         if not game_id:
-            self.document = self._create_game(player_urls, local_player,
-                    width, height)
+            self.document = self._create_game(
+                local_player,
+                width,
+                height
+            )
         else:
             self.game_id = game_id
             self.document = self._fetch_game()
 
-    def _create_game(self, player_urls, local_player, width, height):
+    def _create_game(self, local_player, width, height):
         self.game_id = self._gen_id()
         self.created = True
 
-        if not player_urls:
-            player_urls = []
-
-        snakes, players = self._gen_snakes(player_urls, width, height)
-
         # next setup inital game state
         state = {
-            'id': self.game_id,
-            'board': self._gen_initial_board(snakes, width, height),
-            'snakes': snakes,
+            'id': self.game_id,  # Should this be in here too?
+            'snakes': [],
+            'board': self._gen_initial_board(width, height),
             'turn_num': 0
         }
 
-        id  = self.db.insert({
+        id = self.db.insert({
             'id': self.game_id,
-            'players': players,
             'local_player': local_player,
+            'players': [],
             'state': state,
             'width': width,
             'height': height
@@ -64,54 +67,55 @@ class Game(object):
 
         return self.db.find_one({"_id": id})
 
-    def _gen_snakes(self, player_urls, width, height):
-        snakes = []
-        private_players = []
-        for url in player_urls:
-            id = self._gen_id()
+    def _gen_snake_and_player(self, player_url, width, height):
+        id = self._gen_id()
 
-            # keep player url private
-            private_player = {
-                'url': url,
-                'id': id,
-            }
+        # keep player url private
+        player = {
+            'url': player_url,
+            'id': id,
+        }
 
-            # public player
-            player = {
-                'id': id,
-                'queue': [self._gen_start_position(width, height)]
-            }
-            player['ate_last_turn'] = False
-            player['last_move'] = ''
-            player['name'] = ''
-            player['status'] = 'alive'
-            player['message'] = ''
-            player['points'] = {
-                'kills': 0,
-                'food': 0
-            }
-            snakes.append(player)
-            private_players.append(private_player)
-        return snakes, private_players
+        # public player
+        snake = {
+            'id': id,
+            'queue': [self._gen_start_position(width, height)]
+        }
+        snake['ate_last_turn'] = False
+        snake['last_move'] = ''
+        snake['name'] = ''
+        snake['status'] = 'alive'
+        snake['message'] = ''
+        snake['points'] = {
+            'kills': 0,
+            'food': 0
+        }
 
-    def _gen_initial_board(self, players, width, height):
+        return snake, player
+
+    def _gen_initial_board(self, width, height):
         board = []
+
+        ## BUILD EMPTY BOARD
         for x in range(0, width):
             board.append([])
             for y in range(0, height):
                 board[x].append([])
 
-
-        for player in players:
-            start_pos = player['queue'][0]
-            x = start_pos[0]
-            y = start_pos[1]
-
-            board[x][y].append({
-                'type': 'snake_head',
-                'id': player['id']
-            })
         return board
+
+    def _add_snake_to_board(self, snake):
+        board = self.document['state']['board']
+        start_pos = snake['queue'][0]
+        x = start_pos[0]
+        y = start_pos[1]
+
+        board[x][y].append({
+            'type': 'snake_head',
+            'id': snake['id']
+        })
+
+        self.document['state']['board'] = board
 
     def _gen_start_position(self, width, height):
         return (randint(0, width-1), randint(0, height-1))
@@ -135,6 +139,32 @@ class Game(object):
         except Exception as e:
             result = None
         return result
+
+    ## ADDS A NEW PLAYER API ENDPOINT TO THE GAME
+    def add_player(self, player_url):
+
+        ## CHECK FOR DUPLICATE URL ADD
+        for player in self.document['players']:
+            if player['url'] == player_url:
+                return self.document
+
+        ## CREATE NEW PLAYER AND SNAKE
+        new_snake, new_player = self._gen_snake_and_player(
+            player_url,
+            self.document['width'],
+            self.document['height']
+        )
+
+        ## ADD SNAKE TO BOARD
+        self._add_snake_to_board(new_snake)
+
+        ## UPDATE DOC
+        self.document['players'].append(new_player)
+        self.document['state']['snakes'].append(new_snake)
+
+        self.save()
+
+        return self.document
 
     def do_client_register(self):
         """Registers all the clients asynchronously"""
@@ -174,7 +204,7 @@ class Game(object):
 
     def save(self):
         """saves game to mongo"""
-        self.db.save(self.document)
+        return self.db.save(self.document)
 
     def resolve_food(self):
         pass
@@ -241,14 +271,14 @@ class Game(object):
 
         return False
 
-    def player_remove_old_head(player, x, y):
+    def player_remove_old_head(self, player, x, y):
         board = self.document['state']['board']
         for obj in board[x][y]:
             if obj['id'] == player['id']:
                 obj['type'] = 'snake'
                 return
 
-    def player_add_new_head(player_id, x, y):
+    def player_add_new_head(self, player_id, x, y):
         self.document['state']['board'][x][y].append({'type': 'snake_head', 'id': player_id})
 
     def player_compute_move(self, player, move):
@@ -294,22 +324,21 @@ class Game(object):
 
         return result
 
-    def player_remove_square(player, x, y):
+    def player_remove_square(self, player, x, y):
         square = self.document['state']['board'][x][y]
         for obj in square:
             if obj['id'] == player['id']:
                 square.remove(obj)
                 return
 
-    def player_change_head(player_id, x, y):
+    def player_change_head(self, player_id, x, y):
         board = self.document['state']['board']
         for obj in board[x][y]:
             if obj['id'] == player_id:
                 obj['type'] = 'snake'
                 return
 
-
-    def player_kill(player):
+    def player_kill(self, player):
         print 'killing player: %s' % player['name']
 
         player['status'] = 'dead'
@@ -323,7 +352,7 @@ class Game(object):
                     square.remove(thing)
                     break
 
-    def game_get_player_moves():
+    def game_get_player_moves(self):
         snapshot = self.document['state'].copy()
 
         def get_player_move(player, snapshot):
@@ -339,7 +368,7 @@ class Game(object):
         gevent.joinall(moves)
         return moves
 
-    def game_calculate_collisions(x, y):
+    def game_calculate_collisions(self, x, y):
         square = self.document['state']['board'][x][y]
         to_kill = []
 

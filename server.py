@@ -5,7 +5,7 @@ gevent.monkey.patch_all()
 
 from json import dumps
 
-from bottle import debug, get, post, request, response, run, static_file
+from bottle import debug, get, put, post, request, response, run, static_file
 
 from settings import *
 from game import Game
@@ -26,14 +26,17 @@ def server_css(filename):
     return static_file(filename, root=STATIC_FILES_DIR+'/css')
 
 
-@post('/startwithconfig')
-def start_game():
+@get('/game/<game_id>')
+def get_game_state(game_id):
+    game = Game(game_id)
+    return json.dumps(game.get_state())
+
+
+@post('/game')
+def create_game():
     """
     expects:
     {
-        player_urls: [
-            'url to snake client endpoint', ...
-        ],
         local_player: true|false,
         width: 100,
         height: 100
@@ -42,7 +45,6 @@ def start_game():
     data = request.json
 
     game = Game(
-        player_urls=data['player_urls'],
         local_player=data['local_player'],
         width=data['width'],
         height=data['height']
@@ -51,19 +53,48 @@ def start_game():
     game.do_client_register()
 
     game.save()
-    
-    game.do_client_start()
 
     response.content_type = 'application/json'
     return json.dumps(game.get_state())
 
 
-@post('/uidotick')
-def tick():
+@put('/game.addplayerurl/<game_id>')
+def add_player(game_id):
     """
     expects:
     {
-        game_id: "unique-id-for-game",
+        player_url: "http://my-url-endpoint"
+    }
+    """
+
+    data = request.json
+
+    if 'player_url' not in data:
+        abort(400, "player_url must be passed in request body")
+        return
+
+    game = Game(game_id)
+    game.add_player(data['player_url'])
+
+    return json.dumps(game.get_state())
+
+
+@put('/game.start/<game_id>')
+def start_game(game_id):
+    """
+    expects: N/A
+    """
+
+    game = Game(game_id)
+    game.do_client_start()
+    return json.dumps(game.get_state())
+
+
+@put('/game.tick/<game_id>')
+def tick(game_id):
+    """
+    expects:
+    {
         local_player_move: "n|w|s|e"
     }
     """
