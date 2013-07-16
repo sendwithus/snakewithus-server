@@ -5,5 +5,12 @@ import os
 
 STATIC_FILES_DIR = 'static'
 
-MONGODB_URL = os.environ.get('MONGOHQ_URL', 'mongodb://heroku:364c9b68ffdfa31560f41f5e0d6b53de@dharma.mongohq.com:10058/app16889606')
-MONGODB_DATABASE = MONGODB_URL.split('/')[-1]
+## MONGOHQ_URL should be mongodb://heroku:364c9b68ffdfa31560f41f5e0d6b53de@dharma.mongohq.com:10058/app16889606
+
+# Defaults to localhost
+MONGODB_URL = os.environ.get('MONGOHQ_URL', None)
+
+if MONGODB_URL:
+    MONGODB_DATABASE = MONGODB_URL.split('/')[-1]
+else:
+    MONGODB_DATABASE = 'snakewithus'

@@ -14,6 +14,10 @@ var Board = window.snakewithus.Board = function(ctx, canvas) {
   };
 };
 
+Board.prototype.getGameId = function() {
+  return this.gameState.id;
+};
+
 Board.prototype.kick = function() {
   var that = this;
   this.loop = setInterval( function() {
@@ -30,13 +34,12 @@ Board.prototype.yell = function(callback) {
     game_id: this.gameState.id,
     local_player_move: false
   };
-  console.log('TICK', data);
 
   $.ajax({
-    type: 'POST',
+    type: 'PUT',
     contentType: 'application/json',
     dataType: 'json',
-    url: 'uidotick',
+    url: '/game.tick/'+this.getGameId(),
     data: JSON.stringify(data)
   }).done(function(gameState) {
     callback(gameState);
@@ -44,12 +47,16 @@ Board.prototype.yell = function(callback) {
 };
 
 Board.prototype.init = function(gameState) {
-  this.dimensions = this.getBoardDimensions(gameState.board);
+  this.gameState = gameState;
+  this.dimensions = this.getBoardDimensions(this.gameState.board);
   this.canvas.width = snakewithus.SQUARE_SIZE * this.dimensions[0];
   this.canvas.height = snakewithus.SQUARE_SIZE * this.dimensions[1];
+
+  this.update(gameState);
 };
 
 Board.prototype.update = function(gameState) {
+  console.log('Updated game state.');
   this.gameState = gameState;
 
   this.canvas.width = this.canvas.width;
