@@ -13,8 +13,9 @@ $(function() {
   var $joinGameButton  = $('#join-game');
   var $fetchGameButton = $('#fetch-game');
 
-  var $gameIdContainer = $('#game-id');
   var $messageContainer = $('#messages');
+
+  var $gameIdContainers = $('.game-id');
 
   /** NEW GAME **/
   $newGameButton.on('click', function(e) {
@@ -31,7 +32,7 @@ $(function() {
         local_player: false
       })
     }).done(function(gameState) {
-      $gameIdContainer.text(gameState.id);
+      $gameIdContainers.text(gameState.id);
       board.init(gameState);
       console.log('Initialized board:', board);
 

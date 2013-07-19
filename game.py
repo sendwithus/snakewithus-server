@@ -9,6 +9,7 @@ monkey.patch_all(httplib=True)
 
 from pymongo import MongoClient
 
+from game_id import generate_game_id
 import settings
 
 
@@ -45,7 +46,7 @@ class Game(object):
             self.document = self._fetch_game()
 
     def _create_game(self, local_player, width, height):
-        self.game_id = self._gen_id()
+        self.game_id = generate_game_id()
         self.created = True
 
         # next setup inital game state
@@ -121,7 +122,7 @@ class Game(object):
         return (randint(0, width-1), randint(0, height-1))
 
     def _gen_id(self):
-        return uuid4().urn
+        return str(uuid4())
 
     def _get_mongo_collection(self):
         return self._mongodb[self._MONGODB_COLLECTION_NAME]
