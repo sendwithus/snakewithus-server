@@ -1,6 +1,6 @@
 window.snakewithus = {
   MOVE_DELTA: 1000,
-  SQUARE_SIZE: 60,
+  SQUARE_SIZE: 50,
   SQUARE_PADDING: 4,
   FOOD_PROBABILITY: 0.005,
   SQUARE_TYPES: {
@@ -21,5 +21,12 @@ window.snakewithus = {
   COLORS: {
     FOOD: '#F79E53',
     EMPTY: '#444'
+  },
+  BORDER_CHANGE: 4,
+  KEYS: {
+    UP: 38,
+    DOWN: 40,
+    LEFT: 37,
+    RIGHT: 39
   }
 };

@@ -1,12 +1,36 @@
-body { background: #333; }
+html,body {
+  background: #333;
+  color: #aaa;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+}
+
+h1 { font-size: 1.8em; }
+h2 { font-size: 1.4em; }
+h3 { font-size: 1.3em; }
+
+h1,h2,h3 {
+  font-weight: 400;
+}
 
 .board {
   width: 100%;
-
+  text-align: center;
 }
 
 canvas {
-  border: 10px solid #845FD7;
+  border: 12px solid #5EAB99;
   background: #222;
   padding: 6px;
+}
+
+/** HELPERS **/
+.m-tb {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.tc {
+  text-align: center;
 }

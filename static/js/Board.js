@@ -4,7 +4,7 @@
 var Board = window.snakewithus.Board = function(ctx, canvas) {
   this.ctx = ctx;
   this.canvas = canvas;
-  this.boardDimensions = null;
+  this.dimensions = null;
   this.snakeCache = { };
   this.gameState = {
     id: 'None',
@@ -13,42 +13,89 @@ var Board = window.snakewithus.Board = function(ctx, canvas) {
     turn: 0
   };
 
-  var that = this;
-  // this.loop = setInterval( function() {
-  this.loop = setTimeout( function() {
-    console.log('Yelling...');
-    that.yell( function(gameState) {
-      that.gameState = gameState;
-    });
-  }, snakewithus.MOVE_DELTA);
+  this.testPlayer = false;
 };
 
-Board.prototype.yell = function(callback) {
+Board.prototype.init = function(gameState) {
+  this.gameState = gameState;
+  this.dimensions = this.getBoardDimensions(this.gameState.board);
+  this.canvas.width = snakewithus.SQUARE_SIZE * this.dimensions[0];
+  this.canvas.height = snakewithus.SQUARE_SIZE * this.dimensions[1];
+
+  this.update(gameState);
+};
+
+Board.prototype.getGameId = function() {
+  return this.gameState.id;
+};
+
+Board.prototype.kick = function() {
+  // DON'T KICK IF EXPECTING LOCAL INPUT
+  if (this.testPlayer) { return; }
+
+  var that = this;
+  this.loop = setInterval(
+    this.yell,
+    snakewithus.MOVE_DELTA
+  );
+};
+
+Board.prototype.yell = function(localPlayerMove) {
   var data = {
-    game_id: this.gameState.id,
-    local_player_move: false
+    game_id: this.gameState.id
   };
 
+  if (localPlayerMove) {
+    data.local_player_move = {
+      player_id: this.testPlayer.id,
+      data: {
+        move: localPlayerMove
+      }
+    };
+  }
+
+  var that = this;
+
   $.ajax({
-    type: 'POST',
+    type: 'PUT',
     contentType: 'application/json',
     dataType: 'json',
-    url: 'uidotick',
+    url: '/game.tick/'+this.getGameId(),
     data: JSON.stringify(data)
-  }).done(function( response ) {
-    callback(gameState);
+  }).done(function(gameState) {
+    that.update(gameState);
   });
 };
 
-Board.prototype.update = function(gameState) {
-  if (!this.boardDimensions) {
-    // INIT
-    this.boardDimensions = this.getBoardDimensions(gameState.board);
-    this.canvas.width = snakewithus.SQUARE_SIZE * this.boardDimensions[0];
-    this.canvas.height = snakewithus.SQUARE_SIZE * this.boardDimensions[1];
-  }
+Board.prototype.enableTestMode = function(testPlayer) {
+  this.testPlayer = testPlayer || false;
 
+  var that = this;
+  $(window).on('keydown', function(e) {
+    that.localMove(e.keyCode);
+  });
+};
+
+Board.prototype.localMove = function(key) {
+  if (!this.testPlayer) { return; }
+
+  if (key === snakewithus.KEYS.UP) {
+    this.yell(snakewithus.DIRECTIONS.NORTH);
+  } else if (key === snakewithus.KEYS.DOWN) {
+    this.yell(snakewithus.DIRECTIONS.SOUTH);
+  } else if (key === snakewithus.KEYS.LEFT) {
+    this.yell(snakewithus.DIRECTIONS.WEST);
+  } else if (key === snakewithus.KEYS.RIGHT) {
+    this.yell(snakewithus.DIRECTIONS.EAST);
+  }
+  console.log(key);
+};
+
+Board.prototype.update = function(gameState) {
+  console.log('Updated game state.');
   this.gameState = gameState;
+
+  this.canvas.width = this.canvas.width;
 
   var boardData = gameState.board;
 
@@ -59,7 +106,6 @@ Board.prototype.update = function(gameState) {
       this.drawSquare(x, y, square);
     }
   }
-  console.log('Board dimensions: ', this.boardDimensions);
 };
 
 Board.prototype.drawSquare = function(x, y, square) {
@@ -83,7 +129,7 @@ Board.prototype.drawSquare = function(x, y, square) {
   } else if (square_obj.type === snakewithus.SQUARE_TYPES.FOOD) {
     this.fillSquare(x, y, snakewithus.COLORS.FOOD);
   } else {
-    console.log('INVALID SQUARE TYPE', square_obj.type);
+    console.error('INVALID SQUARE TYPE', square_obj.type);
   }
 };
 
@@ -155,6 +201,5 @@ Board.prototype.genBoard = function(width, height) {
     }
     board.push(row);
   }
-  console.log('Generated new board', board);
   return board;
 };

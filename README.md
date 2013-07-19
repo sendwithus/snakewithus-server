@@ -1,7 +1,7 @@
 snakewithus-server
 ==================
 
-# Cilent methods
+# Client methods
 
 ## register
 
@@ -81,45 +81,7 @@ expected response
     message: ""
 }
 ```
-
-## startwithconfig
-called by ui to start game
-
-```json
-{
-    player_urls: [
-        'url to snake client endpoint', ...
-    ],
-    local_player: true|false,
-    width: 100,
-    height: 100
-}
-```
-
-### expected response
-
-```json
-{
-    game state object
-}
-```
-
-## uidotick
-called by ui at tick
-
-```json
-{
-    game_id: "unique-id-for-game",
-    local_player_move: "n|w|s|e"
-}
-```
-
-### expected response
-```json
-{
-    game state object
-}
-```
+# Object Structures
 
 ## Game state object
 ```json

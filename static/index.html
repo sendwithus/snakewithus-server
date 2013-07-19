@@ -1,17 +1,47 @@
 <html>
 <head>
   <title>snakewithus</title>
+  <link href="http://fonts.googleapis.com/css?family=Orbitron:400,500" rel="stylesheet" type="text/css">
   <link rel="stylesheet" type="text/css" href="css/reset.css">
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
   <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
 <body>
-  <div class="board">
-    <canvas id="canvas">
-      Your browser does not support &lt;canvas&gt;
-    </canvas>
+  <div class="navbar navbar-inverse">
+    <div class="navbar-inner">
+      <a class="brand" href="#">snakewithus</a>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="span12 tc">
+        <h3 id="messages">Hello</h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="span12">
+        <div class="board">
+          <canvas id="canvas">
+            Your browser does not support &lt;canvas&gt;
+          </canvas>
+          <h3 id="game-id"></h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="row m-tb">
+      <div class="span12">
+        <button class="btn btn-large btn-primary" id="create-game">New Game</button>
+        <button class="btn btn-large btn-success hide" id="start-game">Start</button>
+        <button class="btn btn-large btn-warning hide" id="join-game">Join Local</button>
+        <button class="btn btn-large btn-info hide" id="fetch-game">Fetch State</button>
+      </div>
+      </div>
+    </div>
   </div>
 
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+  <script type="text/javascript" src="js/bootstrap.js"></script>
   <script type="text/javascript" src="js/constants.js"></script>
   <script type="text/javascript" src="js/Snake.js"></script>
   <script type="text/javascript" src="js/Board.js"></script>
