@@ -14,6 +14,7 @@ var Board = window.snakewithus.Board = function(ctx, canvas) {
   };
 
   this.testPlayer = false;
+  this.isStarted = false;
 };
 
 Board.prototype.init = function(gameState) {
@@ -30,6 +31,7 @@ Board.prototype.getGameId = function() {
 };
 
 Board.prototype.kick = function() {
+  this.isStarted = true;
   // DON'T KICK IF EXPECTING LOCAL INPUT
   if (this.testPlayer) { return; }
 
@@ -41,6 +43,7 @@ Board.prototype.kick = function() {
 };
 
 Board.prototype.yell = function(localPlayerMove) {
+  if (!this.isStarted) { return; }
   var data = {
     game_id: this.gameState.id
   };
@@ -88,7 +91,6 @@ Board.prototype.localMove = function(key) {
   } else if (key === snakewithus.KEYS.RIGHT) {
     this.yell(snakewithus.DIRECTIONS.EAST);
   }
-  console.log(key);
 };
 
 Board.prototype.update = function(gameState) {

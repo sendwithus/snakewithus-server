@@ -64,11 +64,13 @@ $(function() {
       })
     }).done(function(gameState) {
       $joinGameButton.fadeOut(200);
+      $startGameButton.fadeOut(200);
       board.update(gameState);
       board.kick();
     });
   });
 
+  /** JOIN LOCAL GAME **/
   $joinGameButton.on('click', function(e) {
     $.ajax({
       type: 'PUT',

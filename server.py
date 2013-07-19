@@ -26,6 +26,11 @@ def server_css(filename):
     return static_file(filename, root=STATIC_FILES_DIR+'/css')
 
 
+@get('/favicon.ico')
+def favicon():
+    return static_file('favicon.gif', root=STATIC_FILES_DIR)
+
+
 @get('/game/<game_id>')
 def get_game_state(game_id):
     game = Game(game_id)
