@@ -75,20 +75,25 @@ Board.prototype.enableTestMode = function(testPlayer) {
 
   var that = this;
   $(window).on('keydown', function(e) {
-    that.localMove(e.keyCode);
+    that.localMove(e);
   });
 };
 
-Board.prototype.localMove = function(key) {
+Board.prototype.localMove = function(e) {
   if (!this.testPlayer) { return; }
 
+  key = e.keyCode;
   if (key === snakewithus.KEYS.UP) {
+    e.preventDefault();
     this.yell(snakewithus.DIRECTIONS.NORTH);
   } else if (key === snakewithus.KEYS.DOWN) {
+    e.preventDefault();
     this.yell(snakewithus.DIRECTIONS.SOUTH);
   } else if (key === snakewithus.KEYS.LEFT) {
+    e.preventDefault();
     this.yell(snakewithus.DIRECTIONS.WEST);
   } else if (key === snakewithus.KEYS.RIGHT) {
+    e.preventDefault();
     this.yell(snakewithus.DIRECTIONS.EAST);
   }
 };
