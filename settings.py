@@ -10,6 +10,8 @@ STATIC_FILES_DIR = 'static'
 # Defaults to localhost
 MONGODB_URL = os.environ.get('MONGOHQ_URL', None)
 
+LOCAL_PLAYER_URL = 'local_player'
+
 if MONGODB_URL:
     MONGODB_DATABASE = MONGODB_URL.split('/')[-1]
 else:

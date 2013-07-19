@@ -12,38 +12,8 @@ var Board = window.snakewithus.Board = function(ctx, canvas) {
     snakes: [ ],
     turn: 0
   };
-};
 
-Board.prototype.getGameId = function() {
-  return this.gameState.id;
-};
-
-Board.prototype.kick = function() {
-  var that = this;
-  this.loop = setInterval( function() {
-  // this.loop = setTimeout( function() {
-    console.log('Yelling...');
-    that.yell( function(gameState) {
-      that.update(gameState);
-    });
-  }, snakewithus.MOVE_DELTA);
-};
-
-Board.prototype.yell = function(callback) {
-  var data = {
-    game_id: this.gameState.id,
-    local_player_move: false
-  };
-
-  $.ajax({
-    type: 'PUT',
-    contentType: 'application/json',
-    dataType: 'json',
-    url: '/game.tick/'+this.getGameId(),
-    data: JSON.stringify(data)
-  }).done(function(gameState) {
-    callback(gameState);
-  });
+  this.testPlayer = false;
 };
 
 Board.prototype.init = function(gameState) {
@@ -53,6 +23,72 @@ Board.prototype.init = function(gameState) {
   this.canvas.height = snakewithus.SQUARE_SIZE * this.dimensions[1];
 
   this.update(gameState);
+};
+
+Board.prototype.getGameId = function() {
+  return this.gameState.id;
+};
+
+Board.prototype.kick = function() {
+  // DON'T KICK IF EXPECTING LOCAL INPUT
+  if (this.testPlayer) { return; }
+
+  var that = this;
+  this.loop = setInterval(
+    this.yell,
+    snakewithus.MOVE_DELTA
+  );
+};
+
+Board.prototype.yell = function(localPlayerMove) {
+  var data = {
+    game_id: this.gameState.id
+  };
+
+  if (localPlayerMove) {
+    data.local_player_move = {
+      player_id: this.testPlayer.id,
+      data: {
+        move: localPlayerMove
+      }
+    };
+  }
+
+  var that = this;
+
+  $.ajax({
+    type: 'PUT',
+    contentType: 'application/json',
+    dataType: 'json',
+    url: '/game.tick/'+this.getGameId(),
+    data: JSON.stringify(data)
+  }).done(function(gameState) {
+    that.update(gameState);
+  });
+};
+
+Board.prototype.enableTestMode = function(testPlayer) {
+  this.testPlayer = testPlayer || false;
+
+  var that = this;
+  $(window).on('keydown', function(e) {
+    that.localMove(e.keyCode);
+  });
+};
+
+Board.prototype.localMove = function(key) {
+  if (!this.testPlayer) { return; }
+
+  if (key === snakewithus.KEYS.UP) {
+    this.yell(snakewithus.DIRECTIONS.NORTH);
+  } else if (key === snakewithus.KEYS.DOWN) {
+    this.yell(snakewithus.DIRECTIONS.SOUTH);
+  } else if (key === snakewithus.KEYS.LEFT) {
+    this.yell(snakewithus.DIRECTIONS.WEST);
+  } else if (key === snakewithus.KEYS.RIGHT) {
+    this.yell(snakewithus.DIRECTIONS.EAST);
+  }
+  console.log(key);
 };
 
 Board.prototype.update = function(gameState) {

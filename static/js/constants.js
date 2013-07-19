@@ -21,5 +21,12 @@ window.snakewithus = {
   COLORS: {
     FOOD: '#F79E53',
     EMPTY: '#444'
+  },
+  BORDER_CHANGE: 4,
+  KEYS: {
+    UP: 38,
+    DOWN: 40,
+    LEFT: 37,
+    RIGHT: 39
   }
 };

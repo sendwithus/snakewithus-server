@@ -164,7 +164,7 @@ class Game(object):
 
         self.save()
 
-        return self.document
+        return new_player
 
     def do_client_register(self):
         """Registers all the clients asynchronously"""
@@ -283,6 +283,7 @@ class Game(object):
 
     def player_compute_move(self, player, move):
         coords = player['queue'][-1]  # head
+        player_id = player['id']
         x = coords[0]
         y = coords[1]
 
@@ -305,7 +306,6 @@ class Game(object):
             y = y - 1
         elif move == 'w':
             x = x - 1
-
 
         if x > self.document['width'] - 1 or x < 0 or y < 0 or y > self.document['height'] - 1:
             result['kill'] = True
@@ -364,8 +364,11 @@ class Game(object):
             }
             return result
 
-        moves = [gevent.spawn(get_player_move, player, snapshot) for player in self.document['players']]
-        gevent.joinall(moves)
+        moves = []
+        for player in self.document['players']:
+            if player['url'] != settings.LOCAL_PLAYER_URL:
+                moves.append(gevent.spawn(get_player_move, player, snapshot))
+
         return moves
 
     def game_calculate_collisions(self, x, y):
@@ -395,14 +398,14 @@ class Game(object):
         elif len(square) > 2:
             for thing in square:
                 # kill all the non food
-                if thing[ 'type' ] == 'snake_head':
+                if thing['type'] == 'snake_head':
                     to_kill.append(thing['id'])
-                elif thing[ 'type' ] == 'snake':
+                elif thing['type'] == 'snake':
                     self._give_kill(thing['id'])
 
         return to_kill
 
-    def tick(self, local_player_move):
+    def tick(self, local_player_move=None):
 
         to_kill = []
         new_heads = []
@@ -410,24 +413,46 @@ class Game(object):
 
         moves = self.game_get_player_moves()
 
+        ## MOVE LOCAL PLAYER
+        if local_player_move:
+            # Simulate regular move response
+            moves.append({
+                'local_move': local_player_move
+            })
+
         for move in moves:
-            player  = self._get_snake(move.value['player_id'])
-            data = move.value['data']
-            player['message'] = data['message']
+            if 'local_move' in move:
+                move = move['local_move']
+            else:
+                move = move.value
+
+            player_id = move['player_id']
+            player = self._get_snake(player_id)
+
+            data = move['data']
+
+            ## SET PLAYER MESSAGE
+            if 'message' in data:
+                player['message'] = data['message']
+            else:
+                player['message'] = ''
 
             player_move = self.player_compute_move(player, data['move'])
 
-            if player_move['should_kill']:
+            if player_move['kill']:
                 to_kill.append(player)
 
             if player_move['tail']:
-                self.player_remove_square(player, player_move['tail'])
+                x = player_move['tail'][0]
+                y = player_move['tail'][1]
+                self.player_remove_square(player, x, y)
 
-            if player_move['new_head']:
+            if 'new_head' in player_move:
+                print("HELLO %s" % player_move)
                 # only if the player has a new head do we add it
                 # and remove the old one
-                new_heads.append[player_move['new_head']]
-                old_heads.append[player_move['old_head']]
+                new_heads.append(player_move['new_head'])
+                old_heads.append(player_move['old_head'])
 
         # set the old player head as just snake
         for head in old_heads:

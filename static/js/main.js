@@ -4,18 +4,17 @@ $(function() {
 
   var board = new snakewithus.Board(ctx, canvas);
 
-  // var test_board = board.genBoard(20, 20);
-  // sample_board_data.board = test_board;
-
-  // board.init(sample_board_data);
-
+  // HELPERS
   var pollTimeout = null;
 
+  // COMPONENTS
   var $newGameButton   = $('#create-game');
   var $startGameButton = $('#start-game');
+  var $joinGameButton  = $('#join-game');
   var $fetchGameButton = $('#fetch-game');
 
   var $gameIdContainer = $('#game-id');
+  var $messageContainer = $('#messages');
 
   /** NEW GAME **/
   $newGameButton.on('click', function(e) {
@@ -27,8 +26,8 @@ $(function() {
       dataType: 'json',
       url: '/game',
       data: JSON.stringify({
-        width: 10,
-        height: 10,
+        width: 15,
+        height: 15,
         local_player: false
       })
     }).done(function(gameState) {
@@ -38,6 +37,10 @@ $(function() {
 
       // WAIT FOR PLAYERS TO JOIN
       pollTimeout = setInterval(fetchGameState, 800);
+      $newGameButton.hide();
+      $fetchGameButton.fadeIn(400);
+      $joinGameButton.fadeIn(400);
+      $startGameButton.fadeIn(400);
     });
   });
 
@@ -59,8 +62,25 @@ $(function() {
         height: board.dimensions[1]
       })
     }).done(function(gameState) {
+      $joinGameButton.fadeOut(200);
       board.update(gameState);
       board.kick();
+    });
+  });
+
+  $joinGameButton.on('click', function(e) {
+    $.ajax({
+      type: 'PUT',
+      contentType: 'application/json',
+      dataType: 'json',
+      url: '/game.addplayerurl/'+board.getGameId(),
+      data: JSON.stringify({
+        player_url: 'local_player'
+      })
+    }).done(function(player) {
+      $joinGameButton.fadeOut(200);
+      $messageContainer.text('Local Enabled');
+      board.enableTestMode(player);
     });
   });
 
@@ -79,6 +99,18 @@ $(function() {
     e.preventDefault();
     fetchGameState();
   });
+
+  // COOL COLORS
+  var $canvas = $(canvas);
+  var $navbar = $('.navbar-inner');
+  var border = [
+    Math.min(Math.max(100, Math.floor(Math.random()*255)), 200),
+    Math.min(Math.max(100, Math.floor(Math.random()*255)), 200),
+    Math.min(Math.max(100, Math.floor(Math.random()*255)), 200)
+  ];
+  var rgb = 'rgb('+border.join(',')+')';
+  $canvas.css('border-color', rgb);
+  $navbar.css('background', rgb);
 });
 
 sample_board_data = {

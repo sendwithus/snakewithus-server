@@ -74,9 +74,9 @@ def add_player(game_id):
         return
 
     game = Game(game_id)
-    game.add_player(data['player_url'])
+    player = game.add_player(data['player_url'])
 
-    return json.dumps(game.get_state())
+    return json.dumps(player)
 
 
 @put('/game.start/<game_id>')
@@ -95,14 +95,23 @@ def tick(game_id):
     """
     expects:
     {
-        local_player_move: "n|w|s|e"
+        local_player_move: {
+            player_id: <SOMETHING>,
+            move: "n|w|s|e"
+        }
     }
     """
     data = request.json
 
     game = Game(game_id=data['game_id'])
 
-    game.tick(local_player_move=data['local_player_move'])
+    if 'local_player_move' in data:
+        game.tick(
+            local_player_move=data['local_player_move']
+        )
+    else:
+        game.tick()
+
     game.save()
 
     response.content_type = 'application/json'

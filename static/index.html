@@ -7,10 +7,15 @@
   <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
 <body>
+  <div class="navbar navbar-inverse">
+    <div class="navbar-inner">
+      <a class="brand" href="#">snakewithus</a>
+    </div>
+  </div>
   <div class="container">
     <div class="row">
-      <div class="span12">
-        <h1>snakewithus <small id="game-id"></small></h1>
+      <div class="span12 tc">
+        <h3 id="messages">Hello</h3>
       </div>
     </div>
     <div class="row">
@@ -19,14 +24,17 @@
           <canvas id="canvas">
             Your browser does not support &lt;canvas&gt;
           </canvas>
+          <h3 id="game-id"></h3>
         </div>
       </div>
     </div>
+
     <div class="row m-tb">
       <div class="span12">
-        <button class="btn btn-primary" id="create-game">New Game</button>
-        <button class="btn btn-success" id="start-game">Start</button>
-        <button class="btn btn-inverse" id="fetch-game">Fetch State</button>
+        <button class="btn btn-large btn-primary" id="create-game">New Game</button>
+        <button class="btn btn-large btn-success hide" id="start-game">Start</button>
+        <button class="btn btn-large btn-warning hide" id="join-game">Join Local</button>
+        <button class="btn btn-large btn-info hide" id="fetch-game">Fetch State</button>
       </div>
       </div>
     </div>
