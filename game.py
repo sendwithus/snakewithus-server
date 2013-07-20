@@ -313,6 +313,30 @@ class Game(object):
             self.board_remove_piece(position, player['id'])
         player['status'] = 'dead'
 
+
+    def game_get_or_create_highscores(self):
+        highscores = self.db.find_one({"_id": "highscores"})
+
+        if not highscores:
+            id = self.db.insert({
+                '_id': 'highscores',
+                'id': 'highscores',
+                'players': []
+            })
+
+            highscores = self.db.find_one({"_id": "highscores"})
+
+        return highscores
+
+    def game_calculate_highscore(self):
+        highscores = self.game_get_or_create_highscores()
+
+
+
+
+
+
+
     def game_get_player_moves(self):
         snapshot = self.document['state'].copy()
 
@@ -440,17 +464,18 @@ class Game(object):
             to_kill = to_kill + new_kills
 
         # 2: kill collisions
-        alive_count = 0
+        alive_players = []
         for player in self.document['state']['snakes']:
             if player['id'] in to_kill and not player['status'] == 'dead':
                 to_kill.remove(player['id'])
                 self.player_kill(player)
-            if player['status'] == alive
-                alive_count += 1
+            if player['status'] == 'alive':
+                alive_players.append(player)
 
         # GAME OVER!
-        if alive_count < 2:
+        if len(alive_count) < 2:
             self.document['state']['game_over'] = True
+            self.game_calculate_highscore()
 
         self.document['state']['turn_num'] = int(self.document['state']['turn_num']) + 1
 
