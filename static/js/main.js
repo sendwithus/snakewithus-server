@@ -115,11 +115,14 @@ $(function() {
 
   var formatSnakePoints = function(points) {
     return '<small class="food-label">food:</small> '+points.food+'&nbsp;&nbsp;'+
-           '<small class="life-label">life:</small> '+points.life+'&nbsp;&nbsp;'+
+           '<small class="life-label">age:</small> '+points.life+'&nbsp;&nbsp;'+
            '<small class="kill-label">kills:</small> '+points.kills;
   };
 
   var updateUI = function(gameState) {
+    if (board.isGameOver()) {
+      $messageContainer.text('Game Finished!');
+    }
     var html = '';
     for (var i=0; i<gameState.snakes.length; i++) {
       var snake = gameState.snakes[i];

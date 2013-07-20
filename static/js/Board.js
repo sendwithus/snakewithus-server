@@ -44,6 +44,10 @@ Board.prototype.getGameId = function() {
   return this.gameState.id;
 };
 
+Board.prototype.isGameOver = function() {
+  return this.gameState.game_over;
+};
+
 Board.prototype.kick = function() {
   this.isStarted = true;
   // DON'T KICK IF EXPECTING LOCAL INPUT
@@ -56,8 +60,29 @@ Board.prototype.kick = function() {
   );
 };
 
+Board.prototype.beginAnimation = function() {
+  var that = this;
+  this.animate();
+  this.animationLoop = setInterval(function() {
+    that.animate.call(that);
+  }, 300);
+};
+
+Board.prototype.animate = function() {
+  var boardData = this.gameState.board;
+  for (var y=0; y<boardData.length; y++) {
+    var row = boardData[y];
+    for (var x=0; x<row.length; x++) {
+      var square = row[x];
+      var color = generateColor();
+      var colorStr = 'rgb('+color.join(',')+')';
+      this.fillSquare(x, y, colorStr);
+    }
+  }
+};
+
 Board.prototype.yell = function(localPlayerMove) {
-  if (!this.isStarted) { return; }
+  if (!this.isStarted || this.isGameOver()) { return; }
   var data = {
     game_id: this.gameState.id
   };
@@ -88,7 +113,7 @@ Board.prototype.enableTestMode = function(testPlayer) {
   this.testPlayer = testPlayer || false;
 
   var that = this;
-  $(window).on('keydown', function(e) {
+  $('body').on('keydown', function(e) {
     that.localMove(e);
   });
 };
@@ -129,6 +154,11 @@ Board.prototype.update = function(gameState) {
 
   if (typeof this.updateCallback === 'function') {
     this.updateCallback(gameState);
+  }
+
+  if (this.isGameOver()) {
+    clearInterval(this.loop);
+    this.beginAnimation();
   }
 };
 
