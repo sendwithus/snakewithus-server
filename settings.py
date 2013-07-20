@@ -14,6 +14,7 @@ LOCAL_PLAYER_URL = 'local_player'
 SNAKE_HEAD = 'snake_head'
 SNAKE = 'snake'
 FOOD = 'food'
+FOOD_CHANCE = 10
 
 if MONGODB_URL:
     MONGODB_DATABASE = MONGODB_URL.split('/')[-1]

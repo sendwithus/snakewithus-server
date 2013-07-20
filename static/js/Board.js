@@ -204,13 +204,12 @@ Board.prototype.fillCircle = function(x, y, color) {
   var halfSquare = Math.round(this.SQUARE_SIZE / 2);
   var xCenter = x * this.SQUARE_SIZE + halfSquare;
   var yCenter = y * this.SQUARE_SIZE + halfSquare;
+  var radius = Math.floor(this.SQUARE_SIZE/2) - snakewithus.FOOD_PADDING;
+
+  console.log(xCenter, yCenter, radius);
 
   this.ctx.beginPath();
-  this.ctx.arc(
-    xCenter, yCenter,
-    Math.floor(this.SQUARE_SIZE/2) - snakewithus.FOOD_PADDING,
-    Math.PI * 2
-  );
+  this.ctx.arc(xCenter, yCenter, radius, 2 * Math.PI);
   this.ctx.fillStyle = color;
   this.ctx.fill();
 };

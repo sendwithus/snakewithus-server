@@ -111,16 +111,11 @@ def tick(game_id):
     game = Game(game_id=data['game_id'])
 
     if 'local_player_move' in data:
-        game.tick(
-            local_player_move=data['local_player_move']
-        )
+        game.tick(local_player_move=data['local_player_move'])
     else:
         game.tick()
 
-    game.save()
-
     response.content_type = 'application/json'
-
     return json.dumps(game.get_state())
 
 

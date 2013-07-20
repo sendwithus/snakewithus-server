@@ -62,7 +62,7 @@ class Game(object):
         board[y][x].append(piece)
 
     def board_maybe_add_food(self):
-        i = randint(0, 10)
+        i = randint(0, settings.FOOD_CHANCE)
         if i == 0:
             empty = self.board_find_empty_square()
             empty.append({
@@ -270,11 +270,12 @@ class Game(object):
         # give food to this snake
         snake = self._get_snake(snake_id)
         snake['stats'][settings.FOOD] += 1
+        snake['ate_last_turn'] = True
 
     def _give_kill(self, snake_id):
         # give kills to this snake
         snake = self._get_snake(snake_id)
-        snake['points']['kills'] += 1
+        snake['stats']['kills'] += 1
 
     def player_compute_move(self, player, move):
         coords = player['queue'][-1]  # head
@@ -318,7 +319,7 @@ class Game(object):
         else:
             # remove tail from player and game board
             tail = player['queue'].pop(0)
-            result['tail'] = tail
+            result['tail'] = (tail[0], tail[1], player_id)
 
         return result
 
@@ -387,6 +388,7 @@ class Game(object):
         self.board_maybe_add_food()
 
         to_kill = []
+        tails = []
         new_heads = []
         old_heads = []
 
@@ -426,9 +428,7 @@ class Game(object):
                 to_kill.append(player)
 
             if player_move['tail']:
-                x = player_move['tail'][0]
-                y = player_move['tail'][1]
-                self.board_remove_piece(player_move['tail'], player['id'])
+                tails.append(player_move['tail'])
 
             if 'new_head' in player_move:
                 # only if the player has a new head do we add it
@@ -454,7 +454,12 @@ class Game(object):
             new_kills = self.game_calculate_collisions(x, y)
 
             # update the kills
-            to_kill = to_kill + new_kills
+            to_kill.extend(new_kills)
+
+        # Remove old tails
+        for tail in tails:
+            pos = (tail[0], tail[1])
+            self.board_remove_piece(pos, tail[2])
 
         # 2: kill collisions
         for player in self.document['state']['snakes']:
@@ -463,6 +468,8 @@ class Game(object):
                 self.player_kill(player)
 
         self.document['state']['turn_num'] = int(self.document['state']['turn_num']) + 1
+
+        self.save()
 
     def get_state(self):
         return self.document['state']
