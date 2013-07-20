@@ -252,12 +252,12 @@ class Game(object):
     def _give_food(self, snake_id):
         # give food to this snake
         snake = self._get_snake(snake_id)
-        snake['stats']['food'] += 1
+        snake['points']['food'] += 1
 
     def _give_kill(self, snake_id):
         # give kills to this snake
         snake = self._get_snake(snake_id)
-        snake['stats']['kills'] += 1
+        snake['points']['kills'] += 1
 
     def player_compute_move(self, player, move):
         coords = player['queue'][-1]  # head
@@ -355,6 +355,7 @@ class Game(object):
                         to_kill.append(thing['id'])
                     elif thing['type'] == 'snake':
                         self._give_kill(thing['id'])
+
         elif len(square) > 2:
             for thing in square:
                 # kill all the non food
