@@ -57,21 +57,17 @@ class Highscores(object):
 
         return self.document
 
-    def game_calculate_highscore(self):
-        highscores = self.game_get_or_create_highscores()
-
-        for player in self.document['state']['snakes']:
-            if player['name'] in highscores:
-                player_scores = highscores[player['name']]
-            else:
-                player_scores = {
+    def update(self, game):
+        for player in game['state']['snakes']:
+            if not player['name'] in self.document['players']:
+                self.document['players'][player['name']] = {
                     'kills': 0,
                     settings.FOOD: 0,
                     'life': 0,
                     'wins': 0
                 }
 
-                highscores.append(player_scores)
+            player_scores = self.document['players'][player['name']]
 
             if player['status'] == 'alive':
                 player_scores['wins'] += 1
@@ -80,7 +76,7 @@ class Highscores(object):
             player_scores['life'] += int(player['stats']['life'])
             player_scores[settings.FOOD] += int(player['stats'][settings.FOOD])
 
-        self.db.save(highscores)
+        self.save()
 
 class Game(object):
 
@@ -437,6 +433,10 @@ class Game(object):
                     self._give_kill(thing['id'])
 
         return to_kill
+
+    def game_calculate_highscore(self):
+        highscores = Highscores(self.db)
+        highscores.update(self.document)
 
     def tick(self, local_player_move=None):
         self.board_maybe_add_food()
