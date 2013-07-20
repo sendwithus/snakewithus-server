@@ -395,12 +395,13 @@ class Game(object):
             }
             return result
 
-        moves = []
+        events = []
         for player in self.document['players']:
             if player['url'] != settings.LOCAL_PLAYER_URL:
-                moves.append(gevent.spawn(get_player_move, player, snapshot))
+                events.append(gevent.spawn(get_player_move, player, snapshot))
 
-        return moves
+        gevent.joinall(events)
+        return events
 
     def game_calculate_collisions(self, x, y):
         square = self.document['state']['board'][y][x]
