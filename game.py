@@ -22,6 +22,66 @@ def get_mongodb():
     return client[settings.MONGODB_DATABASE]
 
 
+class Highscores(object):
+    document = None
+    _MONGODB_COLLECTION_NAME = 'highscores'
+
+    def __init__(self, db=None):
+        self._mongodb = get_mongodb()
+
+        if db:
+            self.db = db
+        else:
+            self.db = self._get_mongo_collection()
+
+    def _get_mongo_collection(self):
+        return self._mongodb[self._MONGODB_COLLECTION_NAME]
+
+    def save(self):
+        self.db.save(self.document)
+
+    def get_or_create(self):
+        self.document = self.db.find_one({"_id": "highscores"})
+
+        if not self.document:
+            id = self.db.insert({
+                '_id': 'highscores',
+                'id': 'highscores',
+                'players': {}
+            })
+
+            self.document = self.db.find_one({"_id": "highscores"})
+
+            # save new highscores
+            self.save()
+
+        return self.document
+
+    def game_calculate_highscore(self):
+        highscores = self.game_get_or_create_highscores()
+
+        for player in self.document['state']['snakes']:
+            if player['name'] in highscores:
+                player_scores = highscores[player['name']]
+            else:
+                player_scores = {
+                    'kills': 0,
+                    settings.FOOD: 0,
+                    'life': 0,
+                    'wins': 0
+                }
+
+                highscores.append(player_scores)
+
+            if player['status'] == 'alive':
+                player_scores['wins'] += 1
+
+            player_scores['kills'] += int(player['stats']['kills'])
+            player_scores['life'] += int(player['stats']['life'])
+            player_scores[settings.FOOD] += int(player['stats'][settings.FOOD])
+
+        self.db.save(highscores)
+
 class Game(object):
 
     document = None
@@ -323,48 +383,6 @@ class Game(object):
         for position in player['queue']:
             self.board_remove_piece(position, player['id'])
         player['status'] = 'dead'
-
-    def game_get_or_create_highscores(self):
-        highscores = self.db.find_one({"_id": "highscores"})
-
-        if not highscores:
-            id = self.db.insert({
-                '_id': 'highscores',
-                'id': 'highscores',
-                'players': {}
-            })
-
-            highscores = self.db.find_one({"_id": "highscores"})
-
-            # save new highscores
-            self.db.save(highscores)
-
-        return highscores
-
-    def game_calculate_highscore(self):
-        highscores = self.game_get_or_create_highscores()
-
-        for player in self.document['state']['snakes']:
-            if player['name'] in highscores:
-                player_scores = highscores[player['name']]
-            else:
-                player_scores = {
-                    'kills': 0,
-                    settings.FOOD: 0,
-                    'life': 0,
-                    'wins': 0
-                }
-
-                highscores.append(player_scores)
-
-            if player['status'] == 'alive':
-                player_scores['wins'] += 1
-
-            player_scores['kills'] += int(player['stats']['kills'])
-            player_scores['life'] += int(player['stats']['life'])
-            player_scores[settings.FOOD] += int(player['stats'][settings.FOOD])
-
-        self.db.save(highscores)
 
     def game_get_player_moves(self):
         snapshot = self.document['state'].copy()

@@ -8,7 +8,7 @@ from json import dumps
 from bottle import debug, get, put, post, request, response, run, static_file
 
 from settings import *
-from game import Game
+from game import Game, Highscores
 
 
 @get('/')
@@ -38,8 +38,8 @@ def get_game_state(game_id):
 
 @get('/highscores')
 def get_highscores():
-    game = Game()
-    return json.dumps(game.game_get_or_create_highscores())
+    hs = Highscores()
+    return json.dumps(hs.get_or_create())
 
 @post('/game')
 def create_game():
