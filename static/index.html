@@ -4,6 +4,7 @@
   <link href="http://fonts.googleapis.com/css?family=Orbitron:400,500" rel="stylesheet" type="text/css">
   <link rel="stylesheet" type="text/css" href="css/reset.css">
   <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="css/bootstrap-responsive.css">
   <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
 <body>
@@ -13,36 +14,51 @@
       <span class="pull-right"><a class="brand game-id" href="#"></a></span>
     </div>
   </div>
-  <div class="container">
-    <div class="row">
-      <div class="span12 tc">
-        <h2 id="messages"></h2>
-      </div>
-    </div>
-    <div class="row">
-      <div class="span12">
-        <div class="board">
-          <canvas id="canvas">
-            Your browser does not support &lt;canvas&gt;
-          </canvas>
-          <h3 class="game-id"></h3>
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <!-- START MAIN -->
+      <div class="span8">
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="board">
+              <canvas id="canvas" class="hide">
+                Your browser does not support &lt;canvas&gt;
+              </canvas>
+              <h3 class="game-id"></h3>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+      <!-- /END MAIN -->
+      <!-- START SIDEBAR -->
+      <div class="span4 sidebar" id="sidebar">
+        <div class="row-fluid">
+          <div class="span12 tc">
+            <h2 id="messages"></h2>
+          </div>
+        </div>
 
-    <div class="row m-tb">
-      <div class="span12 tc" id="button-container">
-        <button class="btn btn-large btn-primary" id="create-game">New Game</button>
-        <button class="btn btn-large btn-success hide" id="start-game">Start</button>
-        <button class="btn btn-large btn-warning hide" id="join-game">Join Local</button>
-        <button class="btn btn-large btn-info hide" id="fetch-game">Fetch State</button>
+        <div class="row-fluid">
+          <div class="span12 tc" id="button-container">
+            <div class="m-tb">
+              <button class="btn btn-huge btn-primary" id="create-game">New Game</button>
+            </div>
+            <div>
+              <button class="btn btn-large btn-success hide" id="start-game">Start</button>
+              <button class="btn btn-large btn-warning hide" id="join-game">Join Local</button>
+            </div>
+            <div class="m-tb">
+              <button class="btn btn-large btn-info hide" id="fetch-game">Fetch State</button>
+            </div>
+          </div>
+        </div>
+        <div class="row-fluid">
+          <div class="span12">
+            <pre id="state" class="hide"></pre>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="row m-tb">
-      <div class="span12" id="button-container">
-        <pre id="state" class="hide"></pre>
-      </div>
-    </div>
+      <!-- /END SIDEBAR -->
   </div>
 
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>

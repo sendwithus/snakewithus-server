@@ -1,8 +1,9 @@
 window.snakewithus = {
   MOVE_DELTA: 1000,
-  SQUARE_SIZE: 50,
-  SQUARE_PADDING: 4,
+  SQUARE_PADDING: 2,
   FOOD_PROBABILITY: 0.005,
+  HEAD_OPACITY: 1,
+  BODY_OPACITY: 0.5,
   SQUARE_TYPES: {
     SNAKE: 'snake',
     SNAKE_HEAD: 'snake_head',
