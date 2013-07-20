@@ -479,7 +479,7 @@ class Game(object):
             new_kills = self.game_calculate_collisions(x, y)
 
             # update the kills
-            to_kill = to_kill + new_kills
+            to_kill = to_kill.append(new_kills)
 
         # 2: kill collisions
         for player in self.document['state']['snakes']:
