@@ -467,7 +467,11 @@ class Game(object):
                 # make sure the playre isnt dead
                 continue
 
-            data = move['data']
+            if 'data' in move:
+                data = move['data']
+            else:
+                ## Kill player if don't pass anything back
+                to_kill.append(player_id)
 
             ## SET PLAYER MESSAGE
             if 'message' in data:
