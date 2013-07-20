@@ -498,6 +498,11 @@ class Game(object):
             self.board_remove_piece((head[0], head[1]), head[2])
             self.board_place_snake((head[0], head[1]), head[2])
 
+        # Remove old tails
+        for tail in tails:
+            pos = (tail[0], tail[1])
+            self.board_remove_piece(pos, tail[2])
+
         # first lets go through and add all the new heads
         for head in new_heads:
             self.board_place_snake_head((head[0], head[1]), head[2])
@@ -512,11 +517,6 @@ class Game(object):
 
             # update the kills
             to_kill.extend(new_kills)
-
-        # Remove old tails
-        for tail in tails:
-            pos = (tail[0], tail[1])
-            self.board_remove_piece(pos, tail[2])
 
         # 2: kill players that were killed
         alive_players = []
