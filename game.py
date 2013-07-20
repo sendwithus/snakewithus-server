@@ -84,12 +84,13 @@ class Game(object):
         }
         snake['ate_last_turn'] = False
         snake['last_move'] = ''
-        snake['name'] = ''
+        snake['name'] = 'No name'
         snake['status'] = 'alive'
         snake['message'] = ''
         snake['points'] = {
             'kills': 0,
-            'food': 0
+            'food': 0,
+            'life': 0
         }
 
         return snake, player

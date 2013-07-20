@@ -35,13 +35,29 @@ pre {
 }
 
 #sidebar {
-  background: #444;
+  background: #292929;
   min-height: 200px;
 }
 
 .btn-huge {
   padding: 30px 50px;
   font-size: 1.4em;
+}
+
+.food-label {
+  color: #F79E53;
+}
+.kill-label {
+  color: #E02527;
+}
+.life-label {
+  color: #7DDB61;
+}
+
+.snake-points {
+  position: relative;
+  top: 8px;
+  padding-right: 20px;
 }
 
 /** HELPERS **/
@@ -52,4 +68,11 @@ pre {
 
 .tc {
   text-align: center;
+}
+.tr {
+  text-align: right;
+}
+
+.ib {
+  display: inline-block;
 }
