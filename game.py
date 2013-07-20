@@ -270,6 +270,7 @@ class Game(object):
         # give food to this snake
         snake = self._get_snake(snake_id)
         snake['stats'][settings.FOOD] += 1
+        snake['ate_last_turn'] = True
 
     def _give_kill(self, snake_id):
         # give kills to this snake
