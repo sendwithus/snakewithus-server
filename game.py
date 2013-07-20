@@ -277,15 +277,18 @@ class Game(object):
 
         # update player queue and board state with new head
         if move == 'n':
-            y = y + 1
+            y = y - 1
         elif move == 'e':
             x = x + 1
         elif move == 's':
-            y = y - 1
+            y = y + 1
         elif move == 'w':
             x = x - 1
 
-        if x > self.document['width'] - 1 or x < 0 or y < 0 or y > self.document['height'] - 1:
+        if x > self.document['width'] - 1 or \
+                x < 0 or \
+                y < 0 or \
+                y > self.document['height'] - 1:
             result['kill'] = True
         else:
             result['new_head'] = (x, y, player_id)
