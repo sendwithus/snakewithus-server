@@ -45,6 +45,54 @@ class Game(object):
             self.game_id = game_id
             self.document = self._fetch_game()
 
+    ## Board Interactions ##
+
+    def board_generate_new(self, width, height):
+        return [[[] for x in range(width)] for y in range(height)]
+
+    def _board_get(self):
+        return self.document['state']['board']
+
+    def _board_add_piece(self, pos, piece):
+        board = set._board_get()
+        (x, y) = pos
+        board[y][x].append(piece)
+
+    def board_remove_piece(self, pos, piece_id):
+        board = self._board_get()
+        (x, y) = pos
+
+        piece_to_remove = None
+        for piece in board[y][x]:
+            if piece['id'] == piece_id:
+                piece_to_remove = piece
+
+        if piece_to_remove:
+            board[y][x].remove(piece_to_remove)
+
+    def board_place_snake(self, pos, snake_id):
+        self.board_add_piece(pos, {
+            'type': 'snake',
+            'id': snake_id
+        })
+
+    def board_place_snake_head(self, pos, snake_id):
+        self.board_add_piece(pos, {
+            'type': 'snake_head',
+            'id': snake_id
+        })
+
+    def board_place_food(self, pos, food_id):
+        self.board_add_piece(pos, {
+            'type': 'food',
+            'id': food_id
+        })
+
+
+
+
+
+
     def _create_game(self, local_player, width, height):
         self.game_id = generate_game_id()
         self.created = True
@@ -53,7 +101,7 @@ class Game(object):
         state = {
             'id': self.game_id,  # Should this be in here too?
             'snakes': [],
-            'board': self._gen_initial_board(width, height),
+            'board': self.board_generate_new(width, height),
             'turn_num': 0
         }
 
@@ -95,29 +143,9 @@ class Game(object):
 
         return snake, player
 
-    def _gen_initial_board(self, width, height):
-        board = []
-
-        ## BUILD EMPTY BOARD
-        for x in range(0, width):
-            board.append([])
-            for y in range(0, height):
-                board[x].append([])
-
-        return board
-
     def _add_snake_to_board(self, snake):
-        board = self.document['state']['board']
         start_pos = snake['queue'][0]
-        x = start_pos[0]
-        y = start_pos[1]
-
-        board[x][y].append({
-            'type': 'snake_head',
-            'id': snake['id']
-        })
-
-        self.document['state']['board'] = board
+        self.board_place_snake_head(start_pos, snake['id'])
 
     def _gen_start_position(self, width, height):
         return (randint(0, width-1), randint(0, height-1))
@@ -231,62 +259,6 @@ class Game(object):
         snake = self._get_snake(snake_id)
         snake['stats']['kills'] += 1
 
-    def apply_player_move(self, player, move):
-        coords = player['queue'][-1]  # head
-        x = coords[0]
-        y = coords[1]
-
-        old_x = x
-        old_y = y
-
-        # snake moves forward, change snake_head to snake
-        board = self.document['state']['board']
-        for obj in board[x][y]:
-            if obj['id'] == player['id']:
-                obj['type'] = 'snake'
-
-        # update player queue and board state with new head
-        if move == 'n':
-            y = y + 1
-        elif move == 'e':
-            x = x + 1
-        elif move == 's':
-            y = y - 1
-        elif move == 'w':
-            x = x - 1
-
-        print 'player moved: (%s,%s) -> (%s,%s)' % (old_x, old_y, x, y)
-
-        if x > self.document['width'] - 1 or x < 0 or y < 0 or y > self.document['height'] - 1:
-            return True
-
-        player['queue'].append((x, y))
-        board[x][y].append({'type': 'snake_head', 'id': player['id']})
-
-        player['last_move'] = move
-
-        if player['ate_last_turn']:
-            player['ate_last_turn'] = False
-        else:
-            # remove tail from player and game board
-            tail = player['queue'].pop(0)
-            square = board[tail[0]][tail[1]]
-            for obj in square:
-                if obj['id'] == player['id']:
-                    square.remove(obj)
-
-        return False
-
-    def player_remove_old_head(self, player, x, y):
-        board = self.document['state']['board']
-        for obj in board[x][y]:
-            if obj['id'] == player['id']:
-                obj['type'] = 'snake'
-                return
-
-    def player_add_new_head(self, player_id, x, y):
-        self.document['state']['board'][x][y].append({'type': 'snake_head', 'id': player_id})
-
     def player_compute_move(self, player, move):
         coords = player['queue'][-1]  # head
         player_id = player['id']
@@ -330,33 +302,12 @@ class Game(object):
 
         return result
 
-    def player_remove_square(self, player, x, y):
-        square = self.document['state']['board'][x][y]
-        for obj in square:
-            if obj['id'] == player['id']:
-                square.remove(obj)
-                return
-
-    def player_change_head(self, player_id, x, y):
-        board = self.document['state']['board']
-        for obj in board[x][y]:
-            if obj['id'] == player_id:
-                obj['type'] = 'snake'
-                return
-
     def player_kill(self, player):
         print 'killing player: %s' % player['name']
 
-        player['status'] = 'dead'
-
         for position in player['queue']:
-            x = position[0]
-            y = position[1]
-            square = self.document['state']['board'][x][y]
-            for thing in square:
-                if thing['id'] == player['id']:
-                    square.remove(thing)
-                    break
+            self.board_remove_piece(position, player['id'])
+        player['status'] = 'dead'
 
     def game_get_player_moves(self):
         snapshot = self.document['state'].copy()
@@ -378,7 +329,7 @@ class Game(object):
         return moves
 
     def game_calculate_collisions(self, x, y):
-        square = self.document['state']['board'][x][y]
+        square = self.document['state']['board'][y][x]
         to_kill = []
 
         if len(square) == 2:
@@ -451,7 +402,7 @@ class Game(object):
             if player_move['tail']:
                 x = player_move['tail'][0]
                 y = player_move['tail'][1]
-                self.player_remove_square(player, x, y)
+                self.board_remove_piece(player_move['tail'], player['id'])
 
             if 'new_head' in player_move:
                 print("HELLO %s" % player_move)
@@ -462,14 +413,12 @@ class Game(object):
 
         # set the old player head as just snake
         for head in old_heads:
-            self.player_change_head(head[2], head[0], head[1])
+            self.board_remove_piece((head[0], head[1]), head[2])
+            self.board_place_snake((head[0], head[1]), head[2])
 
         # first lets go through and add all the new heads
         for head in new_heads:
-            x = head[0]
-            y = head[1]
-
-            self.player_add_new_head(head[2], x, y)
+            self.board_place_snake_head((head[0], head[1]), head[2])
 
         # now lets go back through and do collisions
         for head in new_heads:
