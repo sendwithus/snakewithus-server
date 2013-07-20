@@ -101,7 +101,7 @@ class Game(object):
             for square in row:
                 if len(square) == 0:
                     empties.append(square)
-        rand = randint(0, len(empties))
+        rand = randint(0, len(empties) - 1)
         return empties[rand]
 
     def board_place_food(self, pos, food_id):

@@ -142,8 +142,9 @@ Board.prototype.drawSquare = function(x, y, square) {
   var snake;
   var square_obj = square[0];
 
-  if (!square_obj) { // EMPTY SQUARE
-    this.fillSquare(x, y, snakewithus.COLORS.EMPTY);
+  this.fillSquare(x, y, snakewithus.COLORS.EMPTY);
+  if (!square_obj) {
+    // Nothing
   } else if (square_obj.type === snakewithus.SQUARE_TYPES.SNAKE) {
     snake = this.getSnake(square_obj.id);
     this.fillSquare(x, y, snake.getColor());
@@ -204,12 +205,10 @@ Board.prototype.fillCircle = function(x, y, color) {
   var halfSquare = Math.round(this.SQUARE_SIZE / 2);
   var xCenter = x * this.SQUARE_SIZE + halfSquare;
   var yCenter = y * this.SQUARE_SIZE + halfSquare;
-  var radius = Math.floor(this.SQUARE_SIZE/2) - snakewithus.FOOD_PADDING;
-
-  console.log(xCenter, yCenter, radius);
+  var radius = this.SQUARE_SIZE/2 * snakewithus.FOOD_SIZE;
 
   this.ctx.beginPath();
-  this.ctx.arc(xCenter, yCenter, radius, 2 * Math.PI);
+  this.ctx.arc(xCenter, yCenter, radius, 0, 2 * Math.PI);
   this.ctx.fillStyle = color;
   this.ctx.fill();
 };
