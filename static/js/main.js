@@ -8,6 +8,7 @@ $(function() {
   var pollTimeout = null;
 
   // COMPONENTS
+  var $canvas          = $(canvas);
   var $newGameButton   = $('#create-game');
   var $startGameButton = $('#start-game');
   var $joinGameButton  = $('#join-game');
@@ -28,8 +29,8 @@ $(function() {
       dataType: 'json',
       url: '/game',
       data: JSON.stringify({
-        width: 15,
-        height: 15,
+        width: 30,
+        height: 20,
         local_player: false
       })
     }).done(function(gameState) {
@@ -41,9 +42,11 @@ $(function() {
       // WAIT FOR PLAYERS TO JOIN
       pollTimeout = setInterval(fetchGameState, 800);
       $newGameButton.hide();
-      $fetchGameButton.fadeIn(400);
-      $joinGameButton.fadeIn(400);
-      $startGameButton.fadeIn(400);
+      $canvas.fadeIn(400, function() {
+        $fetchGameButton.fadeIn(400);
+        $joinGameButton.fadeIn(400);
+        $startGameButton.fadeIn(400);
+      });
     });
   });
 
@@ -109,6 +112,10 @@ $(function() {
       board.update(gameState);
     });
   };
+
+  $(window).on('resize', function(e) {
+    // board.resize();
+  });
 
   /** FETCH GAME STATE **/
   $fetchGameButton.on('click', function(e) {

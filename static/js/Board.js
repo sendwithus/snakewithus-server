@@ -17,13 +17,31 @@ var Board = window.snakewithus.Board = function(ctx, canvas) {
   this.isStarted = false;
 };
 
+Board.prototype.resize = function() {
+  var $board = $(this.canvas).closest('.board');
+
+  var width  = $board.innerWidth()-100;
+  var height = $(window).height()-230;
+
+  var size = Math.min(width, height);
+
+  console.log('SIZE', width, height);
+
+  if (size === width) {
+    Math.floor(this.SQUARE_SIZE = size / this.dimensions[1]);
+  } else {
+    Math.floor(this.SQUARE_SIZE = size / this.dimensions[0]);
+  }
+
+  this.canvas.width = this.SQUARE_SIZE * this.dimensions[1];
+  this.canvas.height = this.SQUARE_SIZE * this.dimensions[0];
+};
+
 Board.prototype.init = function(gameState) {
   this.gameState = gameState;
   this.dimensions = this.getBoardDimensions(this.gameState.board);
-  this.canvas.width = snakewithus.SQUARE_SIZE * this.dimensions[0];
-  this.canvas.height = snakewithus.SQUARE_SIZE * this.dimensions[1];
-
   this.update(gameState);
+  this.resize();
 };
 
 Board.prototype.getGameId = function() {
@@ -129,10 +147,10 @@ Board.prototype.drawSquare = function(x, y, square) {
     this.fillSquare(x, y, snakewithus.COLORS.EMPTY);
   } else if (square_obj.type === snakewithus.SQUARE_TYPES.SNAKE) {
     snake = this.getSnake(square_obj.id);
-    this.fillSquare(x, y, snake.color);
+    this.fillSquare(x, y, snake.getColor());
   } else if (square_obj.type === snakewithus.SQUARE_TYPES.SNAKE_HEAD) {
     snake = this.getSnake(square_obj.id);
-    this.fillSquare(x, y, snake.color);
+    this.fillSquare(x, y, snake.getHeadColor());
   } else if (square_obj.type === snakewithus.SQUARE_TYPES.FOOD) {
     this.fillSquare(x, y, snakewithus.COLORS.FOOD);
   } else {
@@ -169,15 +187,15 @@ Board.prototype.getBoardDimensions = function(board) {
 };
 
 Board.prototype.fillSquare = function(x, y, color) {
-  var xStart = x * snakewithus.SQUARE_SIZE;
-  var yStart = y * snakewithus.SQUARE_SIZE;
+  var xStart = x * this.SQUARE_SIZE;
+  var yStart = y * this.SQUARE_SIZE;
 
   this.ctx.beginPath();
   this.ctx.rect(
-    xStart + snakewithus.SQUARE_PADDING,
     yStart + snakewithus.SQUARE_PADDING,
-    snakewithus.SQUARE_SIZE - snakewithus.SQUARE_PADDING * 2,
-    snakewithus.SQUARE_SIZE - snakewithus.SQUARE_PADDING * 2
+    xStart + snakewithus.SQUARE_PADDING,
+    this.SQUARE_SIZE - snakewithus.SQUARE_PADDING * 2,
+    this.SQUARE_SIZE - snakewithus.SQUARE_PADDING * 2
   );
   this.ctx.fillStyle = color;
   this.ctx.fill();

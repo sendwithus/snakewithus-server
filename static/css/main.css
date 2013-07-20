@@ -30,8 +30,18 @@ pre {
   padding: 6px;
 }
 
-#button-container .btn {
+#button-container .btn-large {
   width: 150px;
+}
+
+#sidebar {
+  background: #444;
+  min-height: 200px;
+}
+
+.btn-huge {
+  padding: 30px 50px;
+  font-size: 1.4em;
 }
 
 /** HELPERS **/
