@@ -55,8 +55,6 @@ def create_game():
         height=data['height']
     )
 
-    game.do_client_register()
-
     game.save()
 
     response.content_type = 'application/json'
