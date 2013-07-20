@@ -358,6 +358,7 @@ class Game(object):
                 y < 0 or \
                 y > self.document['height'] - 1:
             result['kill'] = True
+            return result
         else:
             result['new_head'] = (x, y, player_id)
             player['queue'].append((x, y))
@@ -479,12 +480,12 @@ class Game(object):
             player_move = self.player_compute_move(player, data['move'])
 
             if player_move['kill']:
-                to_kill.append(player)
+                to_kill.append(player['id'])
 
             if player_move['tail']:
                 tails.append(player_move['tail'])
 
-            if 'new_head' in player_move:
+            if player_move['new_head']:
                 # only if the player has a new head do we add it
                 # and remove the old one
                 new_heads.append(player_move['new_head'])
@@ -515,14 +516,14 @@ class Game(object):
             pos = (tail[0], tail[1])
             self.board_remove_piece(pos, tail[2])
 
-        # 2: kill collisions
+        # 2: kill players that were killed
         alive_players = []
         for player in self.document['state']['snakes']:
             if player['id'] in to_kill and not player['status'] == 'dead':
                 to_kill.remove(player['id'])
                 self.player_kill(player)
             elif player['status'] == 'alive':
-                alive_players.append(player)
+                alive_players.append(player['id'])
 
         # GAME OVER!
         if len(alive_players) == 0:
