@@ -142,8 +142,9 @@ Board.prototype.drawSquare = function(x, y, square) {
   var snake;
   var square_obj = square[0];
 
-  if (!square_obj) { // EMPTY SQUARE
-    this.fillSquare(x, y, snakewithus.COLORS.EMPTY);
+  this.fillSquare(x, y, snakewithus.COLORS.EMPTY);
+  if (!square_obj) {
+    // Nothing
   } else if (square_obj.type === snakewithus.SQUARE_TYPES.SNAKE) {
     snake = this.getSnake(square_obj.id);
     this.fillSquare(x, y, snake.getColor());
@@ -151,7 +152,7 @@ Board.prototype.drawSquare = function(x, y, square) {
     snake = this.getSnake(square_obj.id);
     this.fillSquare(x, y, snake.getHeadColor());
   } else if (square_obj.type === snakewithus.SQUARE_TYPES.FOOD) {
-    this.fillSquare(x, y, snakewithus.COLORS.FOOD);
+    this.fillCircle(x, y, snakewithus.COLORS.FOOD);
   } else {
     console.error('INVALID SQUARE TYPE', square_obj.type);
   }
@@ -196,6 +197,18 @@ Board.prototype.fillSquare = function(x, y, color) {
     this.SQUARE_SIZE - snakewithus.SQUARE_PADDING * 2,
     this.SQUARE_SIZE - snakewithus.SQUARE_PADDING * 2
   );
+  this.ctx.fillStyle = color;
+  this.ctx.fill();
+};
+
+Board.prototype.fillCircle = function(x, y, color) {
+  var halfSquare = Math.round(this.SQUARE_SIZE / 2);
+  var xCenter = x * this.SQUARE_SIZE + halfSquare;
+  var yCenter = y * this.SQUARE_SIZE + halfSquare;
+  var radius = this.SQUARE_SIZE/2 * snakewithus.FOOD_SIZE;
+
+  this.ctx.beginPath();
+  this.ctx.arc(xCenter, yCenter, radius, 0, 2 * Math.PI);
   this.ctx.fillStyle = color;
   this.ctx.fill();
 };
