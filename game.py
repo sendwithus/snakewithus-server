@@ -13,11 +13,6 @@ from game_id import generate_game_id
 import settings
 
 
-class GeventValueHack(object):
-    def __init__(self, value):
-        self.value = value
-
-
 def get_mongodb():
     if settings.MONGODB_URL:
         client = MongoClient(host=settings.MONGODB_URL)
@@ -410,7 +405,7 @@ class Game(object):
                 events.append(gevent.spawn(get_player_move, player, snapshot))
 
         gevent.joinall(events)
-        return events
+        return [e.value for e in events]
 
     def game_calculate_collisions(self, x, y):
         square = self.document['state']['board'][y][x]
@@ -461,14 +456,10 @@ class Game(object):
 
         moves = self.game_get_player_moves()
 
-        ## MOVE LOCAL PLAYER
         if local_player_move:
-            # Simulate regular move response
-            moves.append(GeventValueHack(local_player_move))
+            moves.append(local_player_move)
 
         for move in moves:
-            move = move.value
-
             player_id = move['player_id']
             player = self._get_snake(player_id)
 
