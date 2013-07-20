@@ -302,7 +302,11 @@ class Game(object):
             data = {'game_id': self.game_id}
             return self._client_request(player, 'start', data)
 
-        events = [gevent.spawn(client_start, player) for player in self.document['players']]
+        events = []
+        for player in self.document['players']:
+            if player['url'] != settings.LOCAL_PLAYER_URL:
+                events.append(gevent.spawn(client_start, player))
+
         gevent.joinall(events)
 
     def save(self):
