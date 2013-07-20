@@ -13,6 +13,7 @@ $(function() {
   var $startGameButton = $('#start-game');
   var $joinGameButton  = $('#join-game');
   var $fetchGameButton = $('#fetch-game');
+  var $playerList      = $('#player-list');
 
   var $messageContainer = $('#messages');
   var $stateContainer = $('#state');
@@ -35,7 +36,7 @@ $(function() {
       })
     }).done(function(gameState) {
       $gameIdContainers.text(gameState.id);
-      board.init(gameState);
+      board.init(gameState, updateUI);
       console.log('Initialized board:', board);
       $messageContainer.text('Waiting for players...');
 
@@ -88,7 +89,6 @@ $(function() {
       })
     }).done(function(player) {
       $joinGameButton.fadeOut(200);
-      $messageContainer.text('Local Enabled. '+$messageContainer.text());
       board.enableTestMode(player);
     });
   });
@@ -111,6 +111,31 @@ $(function() {
       // UPDATE BOARD
       board.update(gameState);
     });
+  };
+
+  var formatSnakePoints = function(points) {
+    return '<small class="food-label">food:</small> '+points.food+'&nbsp;&nbsp;'+
+           '<small class="life-label">life:</small> '+points.life+'&nbsp;&nbsp;'+
+           '<small class="kill-label">kills:</small> '+points.kills;
+  };
+
+  var updateUI = function(gameState) {
+    var html = '';
+    for (var i=0; i<gameState.snakes.length; i++) {
+      var snake = gameState.snakes[i];
+      html += '<li>'+
+        '<div class="ib snake-points tr pull-right">'+
+          formatSnakePoints(snake.points)+
+        '</div>'+
+        '<h3'+
+          ' data-player="'+snake.id+'"'+
+          ' style="color:'+board.getSnake(snake.id).getColor()+'"'+
+        '>* '+
+          snake.name+':&nbsp;'+
+        '</h3>'+
+      '</li>';
+    }
+    $playerList.html(html);
   };
 
   $(window).on('resize', function(e) {

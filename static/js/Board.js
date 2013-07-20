@@ -20,24 +20,20 @@ var Board = window.snakewithus.Board = function(ctx, canvas) {
 Board.prototype.resize = function() {
   var $board = $(this.canvas).closest('.board');
 
-  var width  = $board.innerWidth()-100;
-  var height = $(window).height()-230;
+  var width  = $board.innerWidth()-60;
+  var height = $(window).height()-160;
 
-  var size = Math.min(width, height);
+  var size1 = Math.ceil(width / this.dimensions[1]);
+  var size2 = Math.ceil(height / this.dimensions[0]);
 
-  console.log('SIZE', width, height);
+  this.SQUARE_SIZE = Math.min(size1, size2);
 
-  if (size === width) {
-    Math.floor(this.SQUARE_SIZE = size / this.dimensions[1]);
-  } else {
-    Math.floor(this.SQUARE_SIZE = size / this.dimensions[0]);
-  }
-
-  this.canvas.width = this.SQUARE_SIZE * this.dimensions[1];
+  this.canvas.width  = this.SQUARE_SIZE * this.dimensions[1];
   this.canvas.height = this.SQUARE_SIZE * this.dimensions[0];
 };
 
-Board.prototype.init = function(gameState) {
+Board.prototype.init = function(gameState, updateCallback) {
+  this.updateCallback = updateCallback;
   this.gameState = gameState;
   this.dimensions = this.getBoardDimensions(this.gameState.board);
   this.update(gameState);
@@ -117,7 +113,6 @@ Board.prototype.localMove = function(e) {
 };
 
 Board.prototype.update = function(gameState) {
-  console.log('Updated game state.');
   this.gameState = gameState;
 
   this.canvas.width = this.canvas.width;
@@ -130,6 +125,10 @@ Board.prototype.update = function(gameState) {
       var square = row[x];
       this.drawSquare(x, y, square);
     }
+  }
+
+  if (typeof this.updateCallback === 'function') {
+    this.updateCallback(gameState);
   }
 };
 

@@ -132,12 +132,13 @@ class Game(object):
         }
         snake['ate_last_turn'] = False
         snake['last_move'] = ''
-        snake['name'] = ''
+        snake['name'] = 'No name'
         snake['status'] = 'alive'
         snake['message'] = ''
         snake['points'] = {
             'kills': 0,
-            'food': 0
+            'food': 0,
+            'life': 0
         }
 
         return snake, player
@@ -215,8 +216,12 @@ class Game(object):
 
             return response
 
-        events = [gevent.spawn(client_register, player) for player in self.document['players']]
-        gevent.joinall(events)
+        events = []
+        for player in self.document['players']:
+            if player['url'] == 'local_player':
+                player['name'] = 'Local Snake'
+            else:
+                events.append(gevent.spawn(client_register, player))
 
         for event in events:
             player = self._get_snake(event.value['player_id'])
