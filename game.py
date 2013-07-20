@@ -102,7 +102,8 @@ class Game(object):
             'id': self.game_id,  # Should this be in here too?
             'snakes': [],
             'board': self.board_generate_new(width, height),
-            'turn_num': 0
+            'turn_num': 0,
+            'game_over': False
         }
 
         id = self.db.insert({
@@ -439,10 +440,17 @@ class Game(object):
             to_kill = to_kill + new_kills
 
         # 2: kill collisions
+        alive_count = 0
         for player in self.document['state']['snakes']:
             if player['id'] in to_kill and not player['status'] == 'dead':
                 to_kill.remove(player['id'])
                 self.player_kill(player)
+            if player['status'] == alive
+                alive_count += 1
+
+        # GAME OVER!
+        if alive_count < 2:
+            self.document['state']['game_over'] = True
 
         self.document['state']['turn_num'] = int(self.document['state']['turn_num']) + 1
 
