@@ -54,7 +54,7 @@ class Game(object):
         return self.document['state']['board']
 
     def board_add_piece(self, pos, piece):
-        board = set._board_get()
+        board = self._board_get()
         (x, y) = pos
         board[y][x].append(piece)
 
