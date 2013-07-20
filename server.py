@@ -36,6 +36,10 @@ def get_game_state(game_id):
     game = Game(game_id)
     return json.dumps(game.get_state())
 
+@get('/highscores')
+def get_highscores():
+    game = Game()
+    return json.dumps(game.game_get_or_create_highscores())
 
 @post('/game')
 def create_game():
