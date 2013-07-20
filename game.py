@@ -45,6 +45,9 @@ class Game(object):
             self.game_id = game_id
             self.document = self._fetch_game()
 
+    def _turns_get(self):
+        return self.document['state']['turn_num']
+
     ## Board Interactions ##
 
     def board_generate_new(self, width, height):
@@ -57,6 +60,15 @@ class Game(object):
         board = self._board_get()
         (x, y) = pos
         board[y][x].append(piece)
+
+    def board_maybe_add_food(self):
+        i = randint(0, 40)
+        if i == 0:
+            empty = self.board_find_empty_square()
+            empty.append({
+                'type': 'food',
+                'id': self._gen_id()
+            })
 
     def board_remove_piece(self, pos, piece_id):
         board = self._board_get()
@@ -72,26 +84,31 @@ class Game(object):
 
     def board_place_snake(self, pos, snake_id):
         self.board_add_piece(pos, {
-            'type': 'snake',
+            'type': settings.SNAKE,
             'id': snake_id
         })
 
     def board_place_snake_head(self, pos, snake_id):
         self.board_add_piece(pos, {
-            'type': 'snake_head',
+            'type': settings.SNAKE_HEAD,
             'id': snake_id
         })
 
+    def board_find_empty_square(self):
+        board = self._board_get()
+        empties = []
+        for row in board:
+            for square in row:
+                if len(square) == 0:
+                    empties.append(square)
+        rand = randint(0, len(empties))
+        return empties[rand]
+
     def board_place_food(self, pos, food_id):
         self.board_add_piece(pos, {
-            'type': 'food',
+            'type': settings.FOOD,
             'id': food_id
         })
-
-
-
-
-
 
     def _create_game(self, local_player, width, height):
         self.game_id = generate_game_id()
@@ -135,9 +152,9 @@ class Game(object):
         snake['name'] = 'No name'
         snake['status'] = 'alive'
         snake['message'] = ''
-        snake['points'] = {
+        snake['stats'] = {
             'kills': 0,
-            'food': 0,
+            settings.FOOD: 0,
             'life': 0
         }
 
@@ -252,7 +269,7 @@ class Game(object):
     def _give_food(self, snake_id):
         # give food to this snake
         snake = self._get_snake(snake_id)
-        snake['points']['food'] += 1
+        snake['stats'][settings.FOOD] += 1
 
     def _give_kill(self, snake_id):
         # give kills to this snake
@@ -339,9 +356,9 @@ class Game(object):
             first = square[0]
             second = square[1]
 
-            if first['type'] == 'food' or second['type'] == 'food':
+            if first['type'] == settings.FOOD or second['type'] == settings.FOOD:
                 # snake food collision
-                if first['type'] == 'food':
+                if first['type'] == settings.FOOD:
                     self._give_food(second['id'])
                     square.remove(first)
                 else:
@@ -351,22 +368,23 @@ class Game(object):
             else:
                 for thing in square:
                     # kill all the non food
-                    if thing['type'] == 'snake_head':
+                    if thing['type'] == settings.SNAKE_HEAD:
                         to_kill.append(thing['id'])
-                    elif thing['type'] == 'snake':
+                    elif thing['type'] == settings.SNAKE:
                         self._give_kill(thing['id'])
 
         elif len(square) > 2:
             for thing in square:
                 # kill all the non food
-                if thing['type'] == 'snake_head':
+                if thing['type'] == settings.SNAKE_HEAD:
                     to_kill.append(thing['id'])
-                elif thing['type'] == 'snake':
+                elif thing['type'] == settings.SNAKE:
                     self._give_kill(thing['id'])
 
         return to_kill
 
     def tick(self, local_player_move=None):
+        self.board_maybe_add_food()
 
         to_kill = []
         tails = []
@@ -390,6 +408,10 @@ class Game(object):
 
             player_id = move['player_id']
             player = self._get_snake(player_id)
+
+            if player['status'] == 'dead':
+                # make sure the playre isnt dead
+                continue
 
             data = move['data']
 
@@ -426,6 +448,7 @@ class Game(object):
         for head in new_heads:
             x = head[0]
             y = head[1]
+
             # try and calculate collisions
             new_kills = self.game_calculate_collisions(x, y)
 

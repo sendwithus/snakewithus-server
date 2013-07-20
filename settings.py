@@ -11,6 +11,9 @@ STATIC_FILES_DIR = 'static'
 MONGODB_URL = os.environ.get('MONGOHQ_URL', None)
 
 LOCAL_PLAYER_URL = 'local_player'
+SNAKE_HEAD = 'snake_head'
+SNAKE = 'snake'
+FOOD = 'food'
 
 if MONGODB_URL:
     MONGODB_DATABASE = MONGODB_URL.split('/')[-1]
