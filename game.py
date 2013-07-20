@@ -148,7 +148,7 @@ class Game(object):
         ## CHECK FOR DUPLICATE URL ADD
         for player in self.document['players']:
             if player['url'] == player_url:
-                return self.document
+                return player
 
         ## CREATE NEW PLAYER AND SNAKE
         new_snake, new_player = self._gen_snake_and_player(
