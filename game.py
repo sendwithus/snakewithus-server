@@ -54,7 +54,7 @@ class Game(object):
         return self.document['state']['board']
 
     def board_add_piece(self, pos, piece):
-        board = set._board_get()
+        board = self._board_get()
         (x, y) = pos
         board[y][x].append(piece)
 
@@ -431,7 +431,7 @@ class Game(object):
             new_kills = self.game_calculate_collisions(x, y)
 
             # update the kills
-            to_kill = to_kill.append(new_kills)
+            to_kill.append(new_kills)
 
         # 2: kill collisions
         for player in self.document['state']['snakes']:

@@ -23,13 +23,13 @@ Board.prototype.resize = function() {
   var width  = $board.innerWidth()-60;
   var height = $(window).height()-160;
 
-  var size1 = Math.ceil(width / this.dimensions[1]);
-  var size2 = Math.ceil(height / this.dimensions[0]);
+  var size1 = Math.ceil(width / this.dimensions[0]);
+  var size2 = Math.ceil(height / this.dimensions[1]);
 
   this.SQUARE_SIZE = Math.min(size1, size2);
 
-  this.canvas.width  = this.SQUARE_SIZE * this.dimensions[1];
-  this.canvas.height = this.SQUARE_SIZE * this.dimensions[0];
+  this.canvas.width  = this.SQUARE_SIZE * this.dimensions[0];
+  this.canvas.height = this.SQUARE_SIZE * this.dimensions[1];
 };
 
 Board.prototype.init = function(gameState, updateCallback) {
@@ -191,8 +191,8 @@ Board.prototype.fillSquare = function(x, y, color) {
 
   this.ctx.beginPath();
   this.ctx.rect(
-    yStart + snakewithus.SQUARE_PADDING,
     xStart + snakewithus.SQUARE_PADDING,
+    yStart + snakewithus.SQUARE_PADDING,
     this.SQUARE_SIZE - snakewithus.SQUARE_PADDING * 2,
     this.SQUARE_SIZE - snakewithus.SQUARE_PADDING * 2
   );
