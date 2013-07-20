@@ -275,7 +275,7 @@ class Game(object):
     def _give_kill(self, snake_id):
         # give kills to this snake
         snake = self._get_snake(snake_id)
-        snake['points']['kills'] += 1
+        snake['stats']['kills'] += 1
 
     def player_compute_move(self, player, move):
         coords = player['queue'][-1]  # head
