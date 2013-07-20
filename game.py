@@ -527,7 +527,7 @@ class Game(object):
         # GAME OVER!
         if len(alive_players) == 0:
             self.document['state']['game_over'] = True
-            self.game_calculate_highscore()
+            #self.game_calculate_highscore()
 
         self.document['state']['turn_num'] = int(self.document['state']['turn_num']) + 1
 
