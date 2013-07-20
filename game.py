@@ -61,7 +61,6 @@ class Highscores(object):
 
     def update(self, game):
         for player in game['state']['snakes']:
-            print player, self.document['players']
             if not player['name'] in self.document['players']:
                 self.document['players'][player['name']] = {
                     'kills': 0,
@@ -528,9 +527,11 @@ class Game(object):
                 alive_players.append(player)
 
         # GAME OVER!
-        if len(alive_players) < 2:
+        if len(alive_players) == 1 and local_player_move:
+            pass
+        elif len(alive_players) < 2:
             self.document['state']['game_over'] = True
-            #self.game_calculate_highscore()
+            self.game_calculate_highscore()
 
         self.document['state']['turn_num'] = int(self.document['state']['turn_num']) + 1
 
