@@ -13,6 +13,11 @@ from game_id import generate_game_id
 import settings
 
 
+class GeventValueHack(object):
+    def __init__(value):
+        self.value = value
+
+
 def get_mongodb():
     if settings.MONGODB_URL:
         client = MongoClient(host=settings.MONGODB_URL)
@@ -459,15 +464,10 @@ class Game(object):
         ## MOVE LOCAL PLAYER
         if local_player_move:
             # Simulate regular move response
-            moves.append({
-                'local_move': local_player_move
-            })
+            moves.append(GeventValueHack(local_player_move))
 
         for move in moves:
-            if 'local_move' in move:
-                move = move['local_move']
-            else:
-                move = move.value
+            move = move.value
 
             player_id = move['player_id']
             player = self._get_snake(player_id)
