@@ -6,12 +6,5 @@ var Snake = snakewithus.Snake = function(config_data) {
   this.status = snakewithus.STATUS.ALIVE;
   this.message = '';
   this.points = { };
-  this.color = 'rgba('+this.generateColor().join(',')+',1)';
+  this.color = 'rgba('+generateColor().join(',')+',1)';
 };
-
-Snake.prototype.generateColor = function() {
-  var c = [ ];
-  for (var i=0; i<3; i++) { c.push(Math.floor(Math.random()*256)); }
-  return c;
-};
-

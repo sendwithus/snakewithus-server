@@ -14,6 +14,7 @@ $(function() {
   var $fetchGameButton = $('#fetch-game');
 
   var $messageContainer = $('#messages');
+  var $stateContainer = $('#state');
 
   var $gameIdContainers = $('.game-id');
 
@@ -35,6 +36,7 @@ $(function() {
       $gameIdContainers.text(gameState.id);
       board.init(gameState);
       console.log('Initialized board:', board);
+      $messageContainer.text('Waiting for players...');
 
       // WAIT FOR PLAYERS TO JOIN
       pollTimeout = setInterval(fetchGameState, 800);
@@ -67,6 +69,7 @@ $(function() {
       $startGameButton.fadeOut(200);
       board.update(gameState);
       board.kick();
+      $messageContainer.text('Game has begun.');
     });
   });
 
@@ -82,17 +85,27 @@ $(function() {
       })
     }).done(function(player) {
       $joinGameButton.fadeOut(200);
-      $messageContainer.text('Local Enabled');
+      $messageContainer.text('Local Enabled. '+$messageContainer.text());
       board.enableTestMode(player);
     });
   });
 
-  var fetchGameState = function() {
+  var fetchGameState = function(print) {
     $.ajax({
       type: 'GET',
       dataType: 'json',
       url: '/game/'+board.getGameId()
     }).done(function(gameState) {
+      if (print) {
+        $stateContainer.show().html(
+          'SNAKES:\n'+
+          JSON.stringify(gameState.snakes, null, 2)+
+          '\n\nBOARD:\n'+
+          JSON.stringify(gameState.board, null, 2)
+        );
+      }
+
+      // UPDATE BOARD
       board.update(gameState);
     });
   };
@@ -100,17 +113,13 @@ $(function() {
   /** FETCH GAME STATE **/
   $fetchGameButton.on('click', function(e) {
     e.preventDefault();
-    fetchGameState();
+    fetchGameState(true);
   });
 
   // COOL COLORS
   var $canvas = $(canvas);
   var $navbar = $('.navbar-inner');
-  var border = [
-    Math.min(Math.max(100, Math.floor(Math.random()*255)), 200),
-    Math.min(Math.max(100, Math.floor(Math.random()*255)), 200),
-    Math.min(Math.max(100, Math.floor(Math.random()*255)), 200)
-  ];
+  border = generateColor();
   var rgb = 'rgb('+border.join(',')+')';
   $canvas.css('border-color', rgb);
   $navbar.css('background', rgb);

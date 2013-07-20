@@ -22,6 +22,8 @@ window.snakewithus = {
     FOOD: '#F79E53',
     EMPTY: '#444'
   },
+  MAX_COLOR: 230,
+  MIN_COLOR: 150,
   BORDER_CHANGE: 4,
   KEYS: {
     UP: 38,
@@ -29,4 +31,17 @@ window.snakewithus = {
     LEFT: 37,
     RIGHT: 39
   }
+};
+
+window.generateColor = function() {
+  var color = [ ];
+  for (var i=0; i<3; i++) {
+    var c = Math.min(
+      Math.max(
+        snakewithus.MIN_COLOR, Math.floor(Math.random()*256
+      )
+    ), snakewithus.MAX_COLOR);
+    color.push(c);
+  }
+  return color;
 };
