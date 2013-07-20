@@ -133,23 +133,23 @@ class Game(object):
 
         return self.db.find_one({"_id": id})
 
-    def _gen_snake_and_player(self, player_url, width, height):
-        id = self._gen_id()
+    def _gen_snake_and_player(self, player_url):
+        new_id = self._gen_id()
 
         # keep player url private
         player = {
             'url': player_url,
-            'id': id,
+            'id': new_id,
         }
 
         # public player
         snake = {
-            'id': id,
-            'queue': [self._gen_start_position(width, height)]
+            'id': new_id,
+            'queue': [self._gen_start_position()]
         }
         snake['ate_last_turn'] = False
         snake['last_move'] = ''
-        snake['name'] = 'No name'
+        snake['name'] = 'n/a',
         snake['status'] = 'alive'
         snake['message'] = ''
         snake['stats'] = {
@@ -164,8 +164,11 @@ class Game(object):
         start_pos = snake['queue'][0]
         self.board_place_snake_head(start_pos, snake['id'])
 
-    def _gen_start_position(self, width, height):
-        return (randint(0, width-1), randint(0, height-1))
+    def _gen_start_position(self):
+        return (
+            randint(0, self.document['width'] - 1),
+            randint(0, self.document['height'] - 1)
+        )
 
     def _gen_id(self):
         return str(uuid4())
@@ -195,12 +198,14 @@ class Game(object):
             if player['url'] == player_url:
                 return player
 
-        ## CREATE NEW PLAYER AND SNAKE
-        new_snake, new_player = self._gen_snake_and_player(
-            player_url,
-            self.document['width'],
-            self.document['height']
-        )
+        ## CREATE SNAKE
+        new_snake, new_player = self._gen_snake_and_player(player_url)
+
+        ## CALL REGISTER API TO GET SNAKE NAME
+        player_name = self.do_client_register(new_player)
+
+        ## SET SNAKE NAME
+        new_snake['name'] = player_name
 
         ## ADD SNAKE TO BOARD
         self._add_snake_to_board(new_snake)
@@ -213,36 +218,24 @@ class Game(object):
 
         return new_player
 
-    def do_client_register(self):
-        """Registers all the clients asynchronously"""
-        def client_register(player):
-            data = {
-                'game_id': self.game_id,
-                'client_id': player['id'],
-                'board': {
-                    'width': self.document['width'],
-                    'height': self.document['height'],
-                    'num_players': len(self.document['state']['snakes'])
-                }
+    def do_client_register(self, player):
+        """ Register a new AI, return AI name """
+        register_data = {
+            'game_id': self.game_id,
+            'client_id': player['id'],
+            'board': {
+                'width': self.document['width'],
+                'height': self.document['height']
             }
+        }
 
-            response = {
-                'data': self._client_request(player, 'register', data),
-                'player_id': player['id']
-            }
+        if player['url'] == settings.LOCAL_PLAYER_URL:
+            player_name = 'Local Snake'
+        else:
+            response = self._client_request(player, 'register', register_data)
+            player_name = response['name']
 
-            return response
-
-        events = []
-        for player in self.document['players']:
-            if player['url'] == 'local_player':
-                player['name'] = 'Local Snake'
-            else:
-                events.append(gevent.spawn(client_register, player))
-
-        for event in events:
-            player = self._get_snake(event.value['player_id'])
-            player['name'] = event.value['data']['name']
+        return player_name
 
     def do_client_start(self):
         """Starts all the clients asynchronously"""
