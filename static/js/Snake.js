@@ -14,5 +14,5 @@ Snake.prototype.getColor = function() {
 };
 
 Snake.prototype.getHeadColor = function() {
-  return 'rgba('+this.color.join(',')+','+snakewithus.BODY_OPACITY+')';
+  return 'rgba('+this.color.join(',')+','+snakewithus.HEAD_OPACITY+')';
 };

@@ -35,7 +35,7 @@ $(function() {
       })
     }).done(function(gameState) {
       $gameIdContainers.text(gameState.id);
-      board.init(gameState);
+      board.init(gameState, updateUI);
       console.log('Initialized board:', board);
       $messageContainer.text('Waiting for players...');
 
@@ -111,6 +111,13 @@ $(function() {
       // UPDATE BOARD
       board.update(gameState);
     });
+  };
+
+  var updateUI = function(gameState) {
+    for (var i=0; i<gameState.snakes; i++) {
+      var snake = gameState.snakes[i];
+      console.log(snake);
+    }
   };
 
   $(window).on('resize', function(e) {

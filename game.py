@@ -187,8 +187,12 @@ class Game(object):
 
             return response
 
-        events = [gevent.spawn(client_register, player) for player in self.document['players']]
-        gevent.joinall(events)
+        events = []
+        for player in self.document['players']:
+            if player['url'] == 'local_player':
+                player['name'] = 'Local Snake'
+            else:
+                events.append(gevent.spawn(client_register, player))
 
         for event in events:
             player = self._get_snake(event.value['player_id'])
