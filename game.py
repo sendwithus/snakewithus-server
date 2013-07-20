@@ -407,7 +407,7 @@ class Game(object):
                 y = player_move['tail'][1]
                 self.board_remove_piece(player_move['tail'], player['id'])
 
-            if 'new_head' in player_move:
+            if player_move['new_head']:
                 print("HELLO %s" % player_move)
                 # only if the player has a new head do we add it
                 # and remove the old one
