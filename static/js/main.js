@@ -30,8 +30,8 @@ $(function() {
       dataType: 'json',
       url: '/game',
       data: JSON.stringify({
-        width: 30,
-        height: 20,
+        width: parseInt(getURLParameter('w', 30), 10),
+        height: parseInt(getURLParameter('h', 20), 10),
         local_player: false
       })
     }).done(function(gameState) {

@@ -46,3 +46,14 @@ window.generateColor = function() {
   }
   return color;
 };
+
+window.getURLParameter = function (name, defaultValue) {
+  var val = decodeURI(
+    (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+  );
+
+  if (val === 'null') {
+    val = defaultValue;
+  }
+  return val;
+};
