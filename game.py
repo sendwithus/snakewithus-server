@@ -301,7 +301,7 @@ class Game(object):
         else:
             # remove tail from player and game board
             tail = player['queue'].pop(0)
-            result['tail'] = tail
+            result['tail'] = (tail[0], tail[1], player_id)
 
         return result
 
@@ -369,6 +369,7 @@ class Game(object):
     def tick(self, local_player_move=None):
 
         to_kill = []
+        tails = []
         new_heads = []
         old_heads = []
 
@@ -404,12 +405,9 @@ class Game(object):
                 to_kill.append(player)
 
             if player_move['tail']:
-                x = player_move['tail'][0]
-                y = player_move['tail'][1]
-                self.board_remove_piece(player_move['tail'], player['id'])
+                tails.append(player_move['tail'])
 
             if 'new_head' in player_move:
-                print("HELLO %s" % player_move)
                 # only if the player has a new head do we add it
                 # and remove the old one
                 new_heads.append(player_move['new_head'])
@@ -432,7 +430,12 @@ class Game(object):
             new_kills = self.game_calculate_collisions(x, y)
 
             # update the kills
-            to_kill.append(new_kills)
+            to_kill.extend(new_kills)
+
+        # Remove old tails
+        for tail in tails:
+            pos = (tail[0], tail[1])
+            self.board_remove_piece(pos, tail[2])
 
         # 2: kill collisions
         for player in self.document['state']['snakes']:
@@ -441,6 +444,8 @@ class Game(object):
                 self.player_kill(player)
 
         self.document['state']['turn_num'] = int(self.document['state']['turn_num']) + 1
+
+        self.save()
 
     def get_state(self):
         return self.document['state']
