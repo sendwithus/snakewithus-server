@@ -521,11 +521,11 @@ class Game(object):
             if player['id'] in to_kill and not player['status'] == 'dead':
                 to_kill.remove(player['id'])
                 self.player_kill(player)
-            if player['status'] == 'alive':
+            elif player['status'] == 'alive':
                 alive_players.append(player)
 
         # GAME OVER!
-        if len(alive_count) < 2:
+        if len(alive_players) == 0:
             self.document['state']['game_over'] = True
             self.game_calculate_highscore()
 

@@ -37,7 +37,6 @@ $(function() {
     }).done(function(gameState) {
       $gameIdContainers.text(gameState.id);
       board.init(gameState, updateUI);
-      console.log('Initialized board:', board);
       $messageContainer.text('Waiting for players...');
 
       // WAIT FOR PLAYERS TO JOIN
@@ -101,7 +100,8 @@ $(function() {
     }).done(function(gameState) {
       if (print) {
         $stateContainer.show().html(
-          'SNAKES:\n'+
+          'GAME OVER:\n'+gameState.game_over+
+          '\n\nSNAKES:\n'+
           JSON.stringify(gameState.snakes, null, 2)+
           '\n\nBOARD:\n'+
           JSON.stringify(gameState.board, null, 2)
