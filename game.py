@@ -389,6 +389,10 @@ class Game(object):
             player_id = move['player_id']
             player = self._get_snake(player_id)
 
+            if player['status'] == 'dead':
+                # make sure the playre isnt dead
+                continue
+
             data = move['data']
 
             ## SET PLAYER MESSAGE
@@ -427,6 +431,7 @@ class Game(object):
         for head in new_heads:
             x = head[0]
             y = head[1]
+
             # try and calculate collisions
             new_kills = self.game_calculate_collisions(x, y)
 
