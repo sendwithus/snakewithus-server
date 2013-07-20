@@ -125,7 +125,7 @@ $(function() {
       var snake = gameState.snakes[i];
       html += '<li>'+
         '<div class="ib snake-points tr pull-right">'+
-          formatSnakePoints(snake.points)+
+          formatSnakePoints(snake.stats)+
         '</div>'+
         '<h3'+
           ' data-player="'+snake.id+'"'+

@@ -5,7 +5,7 @@ var Snake = snakewithus.Snake = function(config_data) {
   this.facing = null,
   this.status = snakewithus.STATUS.ALIVE;
   this.message = '';
-  this.points = { };
+  this.stats = { };
   this.color = generateColor();
 };
 
