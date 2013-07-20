@@ -34,6 +34,8 @@ class Highscores(object):
         else:
             self.db = self._get_mongo_collection()
 
+        self.get_or_create()
+
     def _get_mongo_collection(self):
         return self._mongodb[self._MONGODB_COLLECTION_NAME]
 
@@ -59,6 +61,7 @@ class Highscores(object):
 
     def update(self, game):
         for player in game['state']['snakes']:
+            print player, self.document['players']
             if not player['name'] in self.document['players']:
                 self.document['players'][player['name']] = {
                     'kills': 0,
@@ -525,7 +528,7 @@ class Game(object):
                 alive_players.append(player)
 
         # GAME OVER!
-        if len(alive_players) == 0:
+        if len(alive_players) < 2:
             self.document['state']['game_over'] = True
             self.game_calculate_highscore()
 
