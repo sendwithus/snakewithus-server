@@ -62,7 +62,7 @@ class Game(object):
         board[y][x].append(piece)
 
     def board_maybe_add_food(self):
-        i = randint(0, 40)
+        i = randint(0, 10)
         if i == 0:
             empty = self.board_find_empty_square()
             empty.append({
