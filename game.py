@@ -252,12 +252,12 @@ class Game(object):
     def _give_food(self, snake_id):
         # give food to this snake
         snake = self._get_snake(snake_id)
-        snake['stats']['food'] += 1
+        snake['points']['food'] += 1
 
     def _give_kill(self, snake_id):
         # give kills to this snake
         snake = self._get_snake(snake_id)
-        snake['stats']['kills'] += 1
+        snake['points']['kills'] += 1
 
     def player_compute_move(self, player, move):
         coords = player['queue'][-1]  # head
@@ -431,7 +431,7 @@ class Game(object):
             new_kills = self.game_calculate_collisions(x, y)
 
             # update the kills
-            to_kill = to_kill.append(new_kills)
+            to_kill = to_kill + new_kills
 
         # 2: kill collisions
         for player in self.document['state']['snakes']:
