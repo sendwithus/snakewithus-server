@@ -76,7 +76,7 @@ Board.prototype.animate = function() {
     for (var x=0; x<row.length; x++) {
       var square = row[x];
       var color = generateColor();
-      color = makeNonGray(color, 100);
+      color = makeNonGray(color, 150);
       var colorStr = 'rgb('+color.join(',')+')';
       this.fillSquare(x, y, colorStr);
     }
