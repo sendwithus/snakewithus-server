@@ -74,7 +74,6 @@
                           <th>Game Name</th>
                           <th>Food</th>
                           <th>Turns Played</th>
-                          <th>Games Played</th>
                           <th>Kills</th>
                           <th>Games Won</th>
                       </tr>
@@ -86,7 +85,6 @@
                           <td data-bind="text: game.game_id"></td>
                           <td data-bind="text: game.food"></td>
                           <td data-bind="text: game.turns"></td>
-                          <td data-bind="text: game.num_games"></td>
                           <td data-bind="text: game.kills"></td>
                           <td data-bind="text: game.wins"></td>
                       </tr>
@@ -117,7 +115,7 @@
                           <td data-bind="text: game.id"></td>
                           <td data-bind="text: $parent.game_num_players(game)"></td>
                           <td data-bind="text: game.turns"></td>
-                          <td>idk</td>
+                          <td data-bind="text: $parent.game_show_winners(game)"></td>
                       </tr>
                   </tbody>
               </table>
@@ -162,14 +160,18 @@
         self.compute_win_loss_ratio = function (player) {
             var wins = player.totals.wins;
             var games = player.totals.num_games;
+            var ratio = 0;
 
             if (games > 0) {
-                return wins/games;
+                ratio = wins/games;
             } 
 
-            return 0;
+            return ratio.toFixed(2);
         };
 
+        self.game_show_winners = function (game) {
+            return game.winners.join(', ');
+        };
 
         self.game_num_players = function (game) {
             return game.players.length;

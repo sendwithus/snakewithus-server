@@ -70,7 +70,8 @@ class Highscores(object):
             'id': game['id'],
             'type': "game",
             'turns': game['state']['turn_num'],
-            'players': []
+            'players': [],
+            'winners': []
         }
 
         # per game stats per player
@@ -84,6 +85,7 @@ class Highscores(object):
             this_game['name'] = player['name']
 
             if player['id'] in winners:
+                game_doc['winners'].append(player['name'])
                 this_game[settings.WINS] = 1
 
             this_game[settings.NUM_GAMES] = 1
@@ -336,6 +338,18 @@ class Game(object):
 
         gevent.joinall(events)
 
+    def do_client_end(self):
+        def client_end(player):
+            data = {'game_id': self.game_id}
+            return self._client_request(player, 'end', data)
+
+        events = []
+        for player in self.document['players']:
+            if player['url'] != settings.LOCAL_PLAYER_URL:
+                events.append(gevent.spawn(client_end, player))
+
+        gevent.joinall(events)
+
     def save(self):
         """saves game to mongo"""
         return self.db.save(self.document)
@@ -555,7 +569,7 @@ class Game(object):
         alive_players = []
         for player in self.document['state']['snakes']:
             if player['id'] in to_kill and not player['status'] == 'dead':
-                to_kill.remove(player['id'])
+                player['status'] = 'dead'
                 self.player_kill(player)
             elif player['status'] == 'alive':
                 alive_players.append(player['id'])
@@ -563,9 +577,8 @@ class Game(object):
         # GAME OVER!
         if len(alive_players) == 0:
             self.document['state']['game_over'] = True
-            
-            print 'game over, updating highscores'
             self.game_calculate_highscore(to_kill)
+            self.do_client_end()
 
         self.document['state']['turn_num'] = int(self.document['state']['turn_num']) + 1
 
