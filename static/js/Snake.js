@@ -6,7 +6,7 @@ var Snake = snakewithus.Snake = function(config_data) {
   this.status = snakewithus.STATUS.ALIVE;
   this.message = '';
   this.stats = { };
-  this.color = generateColor();
+  this.color = makeNonGray(generateColor());
 };
 
 Snake.prototype.getColor = function() {
