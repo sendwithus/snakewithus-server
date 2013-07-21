@@ -1,0 +1,225 @@
+<html>
+<head>
+  <title>snakewithus</title>
+  <link href="http://fonts.googleapis.com/css?family=Orbitron:400,500" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" type="text/css" href="css/reset.css">
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="css/bootstrap-responsive.css">
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+
+  <div class="navbar navbar-inverse">
+    <div class="navbar-inner">
+      <a class="brand" href="#">snakewithus</a>
+      <span class="pull-right"><a class="brand game-id" href="#"></a></span>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <div class="row-fluid">
+
+      <!-- START MAIN -->
+      <div class="span12">
+        <div class="row-fluid">
+          <div class="span12" data-bind="fadeVisible: !is_player_selected()">
+              <h2>Player Highscores</h2>
+
+              <table class="table table-hover table-striped">
+                  <thead>
+                      <tr>
+                          <th>Player Name</th>
+                          <th>Food</th>
+                          <th>Turns Played</th>
+                          <th>Games Played</th>
+                          <th>Kills</th>
+                          <th>Games Won</th>
+                          <th>W/L Ratio</th>
+                      </tr>
+                  </thead>
+
+                  <tbody data-bind="foreach: { data: players, as: 'player' }">
+                      <tr>
+                          <td>
+                              <a href="#" data-bind="text: player.name, 
+                                  click: $parent.select_player"></a>
+                          </td>
+                          <td data-bind="text: player.totals.food"></td>
+                          <td data-bind="text: player.totals.life"></td>
+                          <td data-bind="text: player.totals.num_games"></td>
+                          <td data-bind="text: player.totals.kills"></td>
+                          <td data-bind="text: player.totals.wins"></td>
+                          <td data-bind="text: $parent.compute_win_loss_ratio(player)"></td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+
+          </div>
+        </div>
+
+
+        <div class="row-fluid">
+          <div class="span12" data-bind="fadeVisible: is_player_selected()">
+              <h2><em data-bind="text: selected_player().name"></em>
+                <span class="pull-right">
+                    <button data-bind="click: close_player_details">x</button>
+                </span>
+              </h2>
+
+              <table class="table table-hover table-striped table-bordered">
+                  <thead>
+                      <tr>
+                          <th>When</th>
+                          <th>Game Name</th>
+                          <th>Food</th>
+                          <th>Turns Played</th>
+                          <th>Games Played</th>
+                          <th>Kills</th>
+                          <th>Games Won</th>
+                      </tr>
+                  </thead>
+
+                  <tbody data-bind="foreach: {data: selected_player().games, as: 'game' }">
+                      <tr>
+                          <td data-bind="text: game.ended_ts"></td>
+                          <td data-bind="text: game.game_id"></td>
+                          <td data-bind="text: game.food"></td>
+                          <td data-bind="text: game.turns"></td>
+                          <td data-bind="text: game.num_games"></td>
+                          <td data-bind="text: game.kills"></td>
+                          <td data-bind="text: game.wins"></td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+        </div>
+
+
+        <div class="row-fluid">
+          <div class="span12">
+              <h2>Games</h2>
+
+              <table class="table table-hover table-striped">
+                  <thead>
+                      <tr>
+                          <th>When</th>
+                          <th>Game Name</th>
+                          <th>Num Players</th>
+                          <th>Num Turns</th>
+                          <th>Winner</th>
+                      </tr>
+                  </thead>
+
+                  <tbody data-bind="foreach: {data: games, as: 'game' }">
+                      <tr>
+                          <td data-bind="text: game.ended_ts"></td>
+                          <td data-bind="text: game.id"></td>
+                          <td data-bind="text: $parent.game_num_players(game)"></td>
+                          <td data-bind="text: game.turns"></td>
+                          <td>idk</td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+        </div>
+      </div>
+      <!-- /END MAIN -->
+
+    </div>
+  </div>
+
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+  <script src="js/knockout-2.3.0.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    var get_hash = function () {
+        var hash = window.location.hash;
+        return hash.substring(1); // remove #
+    };
+
+    ko.bindingHandlers.fadeVisible = {
+        init: function(element, valueAccessor) {
+            // Initially set the element to be instantly visible/hidden depending on the value
+            var value = valueAccessor();
+            $(element).toggle(ko.utils.unwrapObservable(value)); // Use "unwrapObservable" so we can handle values that may or may not be observable
+        },
+        update: function(element, valueAccessor) {
+            // Whenever the value subsequently changes, slowly fade the element in or out
+            var value = valueAccessor();
+            ko.utils.unwrapObservable(value) ? $(element).fadeIn() : $(element).fadeOut();
+        }
+    };
+
+    var ScoreBoardViewModel = function () {
+        var self = this;
+
+        self.players = ko.observableArray([]);
+        self.games = ko.observableArray([]);
+        self.selected_player = ko.observable({});
+        self.is_player_selected = ko.observable(false);
+
+        self.compute_win_loss_ratio = function (player) {
+            var wins = player.totals.wins;
+            var games = player.totals.num_games;
+
+            if (games > 0) {
+                return wins/games;
+            } 
+
+            return 0;
+        };
+
+
+        self.game_num_players = function (game) {
+            return game.players.length;
+        };
+
+        self.player_is_selected = function () {
+            return self.is_player_selected();
+        };
+
+        self.player_table_class = ko.computed(function () {
+            if (self.player_is_selected()) {
+                return 'span6';
+            } else {
+                return 'span12';
+            }
+        });
+
+        self.details_table_class = ko.computed(function () {
+            if (self.player_is_selected()) {
+                return 'span6';
+            } else {
+                return 'hidden';
+            }
+        });
+
+        self.select_player = function (player) {
+            self.selected_player(player);
+            self.is_player_selected(true);
+        };
+
+        self.close_player_details = function () {
+            self.selected_player({});
+            self.is_player_selected(false);
+        };
+
+        ko.computed(function () {
+            $.getJSON('/highscores/players', function (response) {
+                self.players(response);
+            });
+
+            $.getJSON('/highscores/games', function (response) {
+                self.games(response);
+            });
+        });
+    };
+
+    $(function () {
+        ko.applyBindings(new ScoreBoardViewModel());
+    });
+</script>
+
+</body>
+</html>

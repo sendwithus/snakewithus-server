@@ -132,9 +132,10 @@ $(function() {
         '</div>'+
         '<h3'+
           ' data-player="'+snake.id+'"'+
-          ' style="color:'+board.getSnake(snake.id).getColor()+'"'+
-        '>* '+
-          snake.name+':&nbsp;'+
+          ' style="color:'+board.getSnake(snake.id).getHeadColor()+'"'+
+          ' class="snake-name '+snake.status+'"'+
+        '>'+
+          snake.name+'&nbsp;'+
         '</h3>'+
       '</li>';
     }

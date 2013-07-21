@@ -3,7 +3,7 @@ import gevent.monkey
 import json
 gevent.monkey.patch_all()
 
-from json import dumps
+from bson.json_util import dumps
 
 from bottle import debug, get, put, post, request, response, run, static_file
 
@@ -38,8 +38,17 @@ def get_game_state(game_id):
 
 @get('/highscores')
 def get_highscores():
+    return static_file('highscores.html', root=STATIC_FILES_DIR)
+
+@get('/highscores/players')
+def get_player_scores():
     hs = Highscores()
-    return json.dumps(hs.get_or_create())
+    return dumps(hs.get_players()[:])
+
+@get('/highscores/games')
+def get_game_scores():
+    hs = Highscores()
+    return dumps(hs.get_games()[:])
 
 @post('/game')
 def create_game():

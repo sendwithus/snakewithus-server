@@ -140,7 +140,6 @@ Board.prototype.localMove = function(e) {
 };
 
 Board.prototype.update = function(gameState) {
-  console.log('update');
   this.gameState = gameState;
 
   this.canvas.width = this.canvas.width;
