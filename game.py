@@ -468,7 +468,7 @@ class Game(object):
                 continue
 
             ## Validate
-            if 'data' not in move:
+            if not move['data']:
                 to_kill.append(player_id)
                 continue
 
