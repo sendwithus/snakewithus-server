@@ -63,7 +63,7 @@ class Highscores(object):
             player_stats = self.db.find_one({"_id": id})
 
         return player_stats
-    
+
     def update(self, game, winners):
         game_doc = {
             'ended_ts': time(),
@@ -90,7 +90,7 @@ class Highscores(object):
             this_game[settings.KILLS] = int(player['stats'][settings.KILLS])
             this_game[settings.LIFE] = int(player['stats'][settings.LIFE])
             this_game[settings.FOOD] = int(player['stats'][settings.FOOD])
- 
+
             print 'updating player', player_scores['totals'], this_game
 
             for stat in settings.STATS_LIST:
@@ -147,10 +147,12 @@ class Game(object):
         i = randint(0, settings.FOOD_CHANCE)
         if i == 0:
             empty = self.board_find_empty_square()
-            empty.append({
-                'type': 'food',
-                'id': self._gen_id()
-            })
+            print('EMPTY %s' % empty)
+            if empty is not None:
+                empty.append({
+                    'type': 'food',
+                    'id': self._gen_id()
+                })
 
     def board_remove_piece(self, pos, piece_id):
         board = self._board_get()
@@ -183,8 +185,11 @@ class Game(object):
             for square in row:
                 if len(square) == 0:
                     empties.append(square)
-        rand = randint(0, len(empties) - 1)
-        return empties[rand]
+        if len(empties) > 0:
+            rand = randint(0, len(empties) - 1)
+            return empties[rand]
+        else:
+            return None
 
     def board_place_food(self, pos, food_id):
         self.board_add_piece(pos, {
@@ -563,7 +568,7 @@ class Game(object):
         # GAME OVER!
         if len(alive_players) == 0:
             self.document['state']['game_over'] = True
-            
+
             print 'game over, updating highscores'
             self.game_calculate_highscore(to_kill)
 

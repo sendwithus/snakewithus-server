@@ -153,7 +153,6 @@ $(function() {
   });
 
   // COOL COLORS
-  var $canvas = $(canvas);
   var $navbar = $('.navbar-inner');
   border = generateColor();
   var rgb = 'rgb('+border.join(',')+')';
