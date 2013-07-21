@@ -76,7 +76,7 @@ Board.prototype.animate = function() {
     for (var x=0; x<row.length; x++) {
       var square = row[x];
       var color = generateColor();
-      color = makeNonGray(color, 100);
+      //color = makeNonGray(color, 100);
       var colorStr = 'rgb('+color.join(',')+')';
       this.fillSquare(x, y, colorStr);
     }
@@ -140,7 +140,6 @@ Board.prototype.localMove = function(e) {
 };
 
 Board.prototype.update = function(gameState) {
-  console.log('update');
   this.gameState = gameState;
 
   this.canvas.width = this.canvas.width;

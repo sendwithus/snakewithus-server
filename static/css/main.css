@@ -44,6 +44,11 @@ pre {
   font-size: 1.4em;
 }
 
+.snake-name.dead {
+  text-decoration: line-through;
+  opacity:.5;
+}
+
 .food-label {
   color: #F79E53;
 }
