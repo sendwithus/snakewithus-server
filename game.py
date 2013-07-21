@@ -2,6 +2,7 @@ import json
 import requests
 from random import randint
 from uuid import uuid4
+from time import time
 
 import gevent
 from gevent import monkey
@@ -25,63 +26,86 @@ def get_mongodb():
 class Highscores(object):
     document = None
     _MONGODB_COLLECTION_NAME = 'highscores'
+    HSID = 'highscores'
 
-    def __init__(self, db=None):
-        self._mongodb = get_mongodb()
+    def __init__(self, mongo=None):
 
-        if db:
-            self.db = db
+        if mongo:
+            self._mongodb = mongo
         else:
-            self.db = self._get_mongo_collection()
+            self._mongodb = get_mongodb()
 
-        self.get_or_create()
+
+        self.db = self._get_mongo_collection()
 
     def _get_mongo_collection(self):
         return self._mongodb[self._MONGODB_COLLECTION_NAME]
 
-    def save(self):
-        self.db.save(self.document)
+    def get_games(self):
+        return self.db.find({"type": "game"}).sort("_id", 0)
 
-    def get_or_create(self):
-        self.document = self.db.find_one({"_id": "highscores"})
+    def get_players(self):
+        return self.db.find({"type": "player"})
 
-        if not self.document:
-            id = self.db.insert({
-                '_id': 'highscores',
-                'id': 'highscores',
-                'players': {}
-            })
+    def get_player_highscore(self, player):
+        player_stats = self.db.find_one({"type": "player",
+            "name": player['name']})
 
-            self.document = self.db.find_one({"_id": "highscores"})
+        if not player_stats:
+            player_stats = {}
+            player_stats['type'] = "player"
+            player_stats['totals'] = settings.STATS_DICT.copy()
+            player_stats['name'] = player['name']
+            player_stats['games'] = []
 
-            # save new highscores
-            self.save()
+            id = self.db.insert(player_stats)
 
-        return self.document
+            player_stats = self.db.find_one({"_id": id})
 
+        return player_stats
+    
     def update(self, game, winners):
-        for player in game['state']['snakes']:
-            if not player['name'] in self.document['players']:
-                self.document['players'][player['name']] = {
-                    'kills': 0,
-                    settings.FOOD: 0,
-                    'life': 0,
-                    'wins': 0
-                }
+        game_doc = {
+            'ended_ts': time(),
+            'id': game['id'],
+            'type': "game",
+            'turns': game['state']['turn_num'],
+            'players': []
+        }
 
-            player_scores = self.document['players'][player['name']]
+        # per game stats per player
+        this_game = settings.STATS_DICT.copy()
+        this_game['game_id'] = game['id']
+        this_game['ended_ts'] = game_doc['ended_ts']
+        this_game['turns'] = game_doc['turns']
+
+        for player in game['state']['snakes']:
+            player_scores = self.get_player_highscore(player)
+            this_game['name'] = player['name']
 
             if player['id'] in winners:
-                player_scores['wins'] += 1
+                this_game[settings.WINS] = 1
 
-            player_scores['kills'] += int(player['stats']['kills'])
-            player_scores['life'] += int(player['stats']['life'])
-            player_scores[settings.FOOD] += int(player['stats'][settings.FOOD])
+            this_game[settings.NUM_GAMES] = 1
+            this_game[settings.KILLS] = int(player['stats'][settings.KILLS])
+            this_game[settings.LIFE] = int(player['stats'][settings.LIFE])
+            this_game[settings.FOOD] = int(player['stats'][settings.FOOD])
+ 
+            print 'updating player', player_scores['totals'], this_game
 
-        self.save()
+            for stat in settings.STATS_LIST:
+                player_scores['totals'][stat] += this_game[stat]
+
+            player_scores['games'].append(this_game)
+            game_doc['players'].append(this_game)
+
+            self.db.save(player_scores)
+
+        self.db.insert(game_doc)
 
 class Game(object):
 
+    _mongodb = None
     document = None
     _MONGODB_COLLECTION_NAME = 'games'
 
@@ -240,6 +264,9 @@ class Game(object):
         return doc
 
     def _client_request(self, player, path, data):
+        if player['url'] == settings.LOCAL_PLAYER_URL:
+            return None
+
         headers = {'Content-type': 'application/json'}
         r = requests.post(player['url'] + path, data=json.dumps(data), headers=headers)
 
@@ -443,7 +470,7 @@ class Game(object):
         return to_kill
 
     def game_calculate_highscore(self, winners=None):
-        highscores = Highscores(self.db)
+        highscores = Highscores(self._mongodb)
         highscores.update(self.document, winners)
 
     def tick(self, local_player_move=None):
@@ -536,6 +563,8 @@ class Game(object):
         # GAME OVER!
         if len(alive_players) == 0:
             self.document['state']['game_over'] = True
+            
+            print 'game over, updating highscores'
             self.game_calculate_highscore(to_kill)
 
         self.document['state']['turn_num'] = int(self.document['state']['turn_num']) + 1
