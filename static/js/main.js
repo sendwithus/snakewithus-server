@@ -154,7 +154,7 @@ $(function() {
 
   // COOL COLORS
   var $navbar = $('.navbar-inner');
-  border = generateColor();
+  border = makeNonGray(generateColor());
   var rgb = 'rgb('+border.join(',')+')';
   $canvas.css('border-color', rgb);
   $navbar.css('background', rgb);
