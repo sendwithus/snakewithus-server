@@ -464,20 +464,26 @@ class Game(object):
             player = self._get_snake(player_id)
 
             if player['status'] == 'dead':
-                # make sure the playre isnt dead
+                # make sure the player isnt dead
                 continue
 
-            if 'data' in move:
-                data = move['data']
-            else:
-                ## Kill player if don't pass anything back
+            ## Validate
+            if 'data' not in move:
                 to_kill.append(player_id)
+                continue
+
+            data = move['data']
 
             ## SET PLAYER MESSAGE
             if 'message' in data:
                 player['message'] = data['message']
             else:
                 player['message'] = ''
+
+            ## Validate
+            if 'move' not in data:
+                to_kill.append(player_id)
+                continue
 
             player_move = self.player_compute_move(player, data['move'])
 
