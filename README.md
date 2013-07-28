@@ -56,13 +56,14 @@ The server POSTs the game board state to your snake every tick.
 }
 ```
 
-## Game square object
+###Game square object
 
 ```json
 {
     type: "snake|food|snake_head",
     id: "snake id or null"
 }
+```
 
 Expected return data:
 
