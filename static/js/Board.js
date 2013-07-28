@@ -199,7 +199,9 @@ Board.prototype.drawSquare = function(x, y, square) {
     this.fillSquare(x, y, snake.getColor());
   } else if (square_obj.type === snakewithus.SQUARE_TYPES.SNAKE_HEAD) {
     snake = this.getSnake(square_obj.id);
-    this.fillSquare(x, y, snake.getHeadColor());
+    head = snake.getHeadImage();
+    if (head) { this.drawImage(x, y, head); }
+    else { this.fillSquare(x, y, snake.getHeadColor()); }
   } else if (square_obj.type === snakewithus.SQUARE_TYPES.FOOD) {
     this.fillCircle(x, y, snakewithus.COLORS.FOOD);
   } else {
@@ -248,6 +250,15 @@ Board.prototype.fillSquare = function(x, y, color) {
   );
   this.ctx.fillStyle = color;
   this.ctx.fill();
+};
+
+Board.prototype.drawImage = function(x, y, img) {
+  var size = this.SQUARE_SIZE - snakewithus.SQUARE_PADDING * 2;
+
+  var xStart = x * this.SQUARE_SIZE + snakewithus.SQUARE_PADDING;
+  var yStart = y * this.SQUARE_SIZE + snakewithus.SQUARE_PADDING;
+
+  this.ctx.drawImage(img, xStart, yStart, size, size);
 };
 
 Board.prototype.fillCircle = function(x, y, color) {
