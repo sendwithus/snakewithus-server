@@ -312,7 +312,7 @@ class Game(object):
 
         self.save()
 
-        return new_player
+        return player
 
     def do_client_register(self, player):
         """ Register a new AI, return AI name """
