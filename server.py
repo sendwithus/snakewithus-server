@@ -140,4 +140,4 @@ if __name__ == '__main__':
     else:
         # Localhost
         debug(True)
-        run(host='localhost', port=8080)
+        run(host='localhost', port=8002)

@@ -138,6 +138,12 @@ $(function() {
           snake.name+'&nbsp;'+
         '</h3>'+
       '</li>';
+
+      if (snake.message !== '') {
+          var li = '<li><em>' + snake.name + '</em>:<br>' + 
+              snake.message +' </li>';
+          $('#player_messages').prepend(li);
+      }
     }
     $playerList.html(html);
   };

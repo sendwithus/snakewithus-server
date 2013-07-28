@@ -274,6 +274,9 @@ class Game(object):
         if player['url'] == settings.LOCAL_PLAYER_URL:
             return None
 
+        if player['url'][-1] != '/':
+            player['url'] += '/'
+
         headers = {'Content-type': 'application/json'}
         r = requests.post(player['url'] + path, data=json.dumps(data), headers=headers)
 
