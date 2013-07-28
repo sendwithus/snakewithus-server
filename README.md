@@ -16,7 +16,7 @@ What you need to do
 
 The snakewithus server will POST to 5 different endpoints that your snake has to respond to.
 
-1. /register
+* /register
 
 A request is made to this endpoint once when you register.  Expected return data:
 
@@ -27,17 +27,44 @@ A request is made to this endpoint once when you register.  Expected return data
 }
 ```
 
-2. /start
+* /start
 
 A request is made to this endpoint when the game starts.  You can do stuff here if you want.
 
-3. /end
+* /end
 
 A request is made here when your snake dies.  Do stuff.
 
-4. /tick
+* /tick
 
-The server POSTs the game board state to your snake every tick.  Expected return data:
+The server POSTs the game board state to your snake every tick.  
+
+```json
+{
+    game_id: "<SOME_ID>",
+    id: <ID>,
+    snakes: [ <SNAKE_OBJ> ],
+    board: [
+        [
+            [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ... // Game square objects (see below)
+            [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
+            [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
+        ], ...
+    ],
+    turn_num: 0,
+    game_over: False
+}
+```
+
+## Game square object
+
+```json
+{
+    type: "snake|food|snake_head",
+    id: "snake id or null"
+}
+
+Expected return data:
 
 ```json
 
@@ -51,10 +78,15 @@ The server POSTs the game board state to your snake every tick.  Expected return
 How to register your snake
 --------------------------
 
-Create a new game by going to snakewithus-server.herokuapp.com and clicking "NEW GAME".  It will create a game instance for you.
+Create a new game by going to snakewithus-server.herokuapp.com and clicking "NEW GAME".  It will create a game instance for you.  Use the following curl command to register your snake AI with the game instance.
 
     curl -XPUT 'http://snakewithus-server.herokuapp.com/game.addplayerurl/game-name' -d '{ "player_url": "http://yourserver.com" }' -H "content-type: application/json"    
 
+
+Writing your AI
+---------------
+
+The request to your /tick endpoint happens every game tick.  It will post the game board to your snake.  It looks like a 2d array with every game tile being an array.
 
 
 
