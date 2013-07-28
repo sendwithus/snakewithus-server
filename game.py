@@ -70,7 +70,8 @@ class Highscores(object):
             'id': game['id'],
             'type': "game",
             'turns': game['state']['turn_num'],
-            'players': []
+            'players': [],
+            'winners': []
         }
 
         # per game stats per player
@@ -84,6 +85,7 @@ class Highscores(object):
             this_game['name'] = player['name']
 
             if player['id'] in winners:
+                game_doc['winners'].append(player['name'])
                 this_game[settings.WINS] = 1
 
             this_game[settings.NUM_GAMES] = 1
@@ -147,10 +149,12 @@ class Game(object):
         i = randint(0, settings.FOOD_CHANCE)
         if i == 0:
             empty = self.board_find_empty_square()
-            empty.append({
-                'type': 'food',
-                'id': self._gen_id()
-            })
+            print('EMPTY %s' % empty)
+            if empty is not None:
+                empty.append({
+                    'type': 'food',
+                    'id': self._gen_id()
+                })
 
     def board_remove_piece(self, pos, piece_id):
         board = self._board_get()
@@ -183,8 +187,11 @@ class Game(object):
             for square in row:
                 if len(square) == 0:
                     empties.append(square)
-        rand = randint(0, len(empties) - 1)
-        return empties[rand]
+        if len(empties) > 0:
+            rand = randint(0, len(empties) - 1)
+            return empties[rand]
+        else:
+            return None
 
     def board_place_food(self, pos, food_id):
         self.board_add_piece(pos, {
@@ -236,9 +243,9 @@ class Game(object):
         snake['status'] = 'alive'
         snake['message'] = ''
         snake['stats'] = {
-            'kills': 0,
+            settings.KILLS: 0,
             settings.FOOD: 0,
-            'life': 0
+            settings.LIFE: 0
         }
 
         return snake, player
@@ -336,6 +343,18 @@ class Game(object):
 
         gevent.joinall(events)
 
+    def do_client_end(self):
+        def client_end(player):
+            data = {'game_id': self.game_id}
+            return self._client_request(player, 'end', data)
+
+        events = []
+        for player in self.document['players']:
+            if player['url'] != settings.LOCAL_PLAYER_URL:
+                events.append(gevent.spawn(client_end, player))
+
+        gevent.joinall(events)
+
     def save(self):
         """saves game to mongo"""
         return self.db.save(self.document)
@@ -358,7 +377,7 @@ class Game(object):
     def _give_kill(self, snake_id):
         # give kills to this snake
         snake = self._get_snake(snake_id)
-        snake['stats']['kills'] += 1
+        snake['stats'][settings.KILLS] += 1
 
     def player_compute_move(self, player, move):
         coords = player['queue'][-1]  # head
@@ -556,7 +575,7 @@ class Game(object):
         alive_players = []
         for player in self.document['state']['snakes']:
             if player['id'] in to_kill and not player['status'] == 'dead':
-                to_kill.remove(player['id'])
+                player['status'] = 'dead'
                 self.player_kill(player)
             elif player['status'] == 'alive':
                 alive_players.append(player['id'])
@@ -564,9 +583,9 @@ class Game(object):
         # GAME OVER!
         if len(alive_players) == 0:
             self.document['state']['game_over'] = True
-
             print 'game over, updating highscores'
             self.game_calculate_highscore(to_kill)
+            self.do_client_end()
 
         self.document['state']['turn_num'] = int(self.document['state']['turn_num']) + 1
 
