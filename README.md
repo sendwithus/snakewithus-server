@@ -87,8 +87,7 @@ Create a new game by going to snakewithus-server.herokuapp.com and clicking "NEW
 Writing your AI
 ---------------
 
-The request to your /tick endpoint happens every game tick.  It will post the game board to your snake.  It looks like a 2d array with every game tile being an array.
-
+The request to your /tick endpoint happens every game tick.  It will post the game board to your snake.  Figure out which direction to go next turn and let er fly!
 
 
 snakewithus-server
