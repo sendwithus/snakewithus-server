@@ -35,7 +35,6 @@ class Highscores(object):
         else:
             self._mongodb = get_mongodb()
 
-
         self.db = self._get_mongo_collection()
 
     def _get_mongo_collection(self):
@@ -295,10 +294,11 @@ class Game(object):
         new_snake, new_player = self._gen_snake_and_player(player_url)
 
         ## CALL REGISTER API TO GET SNAKE NAME
-        player_name = self.do_client_register(new_player)
+        player = self.do_client_register(new_player)
 
         ## SET SNAKE NAME
-        new_snake['name'] = player_name
+        new_snake['name'] = player['name']
+        new_snake['head_img_url'] = player['head_img_url']
 
         ## ADD SNAKE TO BOARD
         self._add_snake_to_board(new_snake)
@@ -328,7 +328,16 @@ class Game(object):
             response = self._client_request(player, 'register', register_data)
             player_name = response['name']
 
-        return player_name
+        head_img = ''
+        if 'head_img_url' in response:
+            head_img = response['head_img_url']
+
+        player = {
+            'name': player_name,
+            'head_img_url': head_img
+        }
+
+        return player
 
     def do_client_start(self):
         """Starts all the clients asynchronously"""
