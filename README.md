@@ -53,7 +53,7 @@ How to register your snake
 
 Create a new game by going to snakewithus-server.herokuapp.com and clicking "NEW GAME".  It will create a game instance for you.
 
-curl -XPUT 'http://snakewithus-server.herokuapp.com/game.addplayerurl/<game name>' -d '{ "player_url": "<your server url>" }' -H "content-type: application/json"    
+curl -XPUT 'http://snakewithus-server.herokuapp.com/game.addplayerurl/game-name' -d '{ "player_url": "http://yourserver.com" }' -H "content-type: application/json"    
 
 
 
