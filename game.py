@@ -325,15 +325,16 @@ class Game(object):
             }
         }
 
+        head_img = ''
+
         if player['url'] == settings.LOCAL_PLAYER_URL:
             player_name = 'Local Snake'
         else:
             response = self._client_request(player, 'register', register_data)
             player_name = response['name']
 
-        head_img = ''
-        if 'head_img_url' in response:
-            head_img = response['head_img_url']
+            if 'head_img_url' in response:
+                head_img = response['head_img_url']
 
         player = {
             'name': player_name,
