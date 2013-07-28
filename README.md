@@ -1,3 +1,27 @@
+SNAKEWITHUS
+===========
+
+What you need to know
+---------------------
+
+This isn't any old game of snake.  Here are some differences.
+
+* It's multiplayer.
+* You control your snake by writing AI
+* It's RESTful
+
+
+What you need to do
+-------------------
+
+The snakewithus server will POST to 5 different endpoints that your snake has to respond to.
+
+1. /register
+2. /start
+3. /end
+4. /tick
+
+
 snakewithus-server
 ==================
 
