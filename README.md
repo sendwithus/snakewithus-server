@@ -26,10 +26,11 @@ snakewithus-server
 ==================
 
 # Client methods
+clients must implement the below REST methods
 
 ## register
 
-called with the client joins a new game
+called when the client joins a new game
 
 request body
 
@@ -93,7 +94,7 @@ called at every game tick
 
 ```json
 {
-    game state object
+    Game state object (see below)
 }
 ```
 
@@ -113,7 +114,7 @@ expected response
     id: "unique-id-for-game",
     board: [
         [
-            [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
+            [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ... // Game square objects (see below)
             [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
             [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
         ], ...
@@ -139,7 +140,7 @@ expected response
 ## Game square object
 
 ```json
-square: {
+{
     type: "snake|food|snake_head",
     id: "snake id or null"
 }

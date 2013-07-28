@@ -506,6 +506,7 @@ class Game(object):
             moves.append(local_player_move)
 
         for move in moves:
+            print move
             player_id = move['player_id']
             player = self._get_snake(player_id)
 
@@ -582,6 +583,7 @@ class Game(object):
         # GAME OVER!
         if len(alive_players) == 0:
             self.document['state']['game_over'] = True
+            print 'game over, updating highscores'
             self.game_calculate_highscore(to_kill)
             self.do_client_end()
 
