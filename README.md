@@ -17,9 +17,38 @@ What you need to do
 The snakewithus server will POST to 5 different endpoints that your snake has to respond to.
 
 1. /register
+
+A request is made to this endpoint once when you register.  Expected return data:
+
+```json
+{
+    name: "Franky",
+    head_img_url: "path/to/your/snake/head"
+}
+```
+
 2. /start
+
+A request is made to this endpoint when the game starts.  You can do stuff here if you want.
+
 3. /end
+
+A request is made here when your snake dies.  Do stuff.
+
 4. /tick
+
+The server POSTs the game board state to your snake every tick.  Expected return data:
+
+```json
+
+{
+    move: "n|e|s|w",
+    message: "troll comment"
+}
+
+```
+
+
 
 
 snakewithus-server
