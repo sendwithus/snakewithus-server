@@ -277,7 +277,7 @@ class Game(object):
             player['url'] += '/'
 
         headers = {'Content-type': 'application/json'}
-        r = requests.post(player['url'] + path, data=json.dumps(data), headers=headers)
+        r = requests.post(player['url'] + path, data=json.dumps(data), headers=headers, timeout=30)
 
         try:
             result = r.json()
