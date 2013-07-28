@@ -63,7 +63,7 @@ class Highscores(object):
             player_stats = self.db.find_one({"_id": id})
 
         return player_stats
-    
+
     def update(self, game, winners):
         game_doc = {
             'ended_ts': time(),
@@ -90,7 +90,7 @@ class Highscores(object):
             this_game[settings.KILLS] = int(player['stats'][settings.KILLS])
             this_game[settings.LIFE] = int(player['stats'][settings.LIFE])
             this_game[settings.FOOD] = int(player['stats'][settings.FOOD])
- 
+
             print 'updating player', player_scores['totals'], this_game
 
             for stat in settings.STATS_LIST:
@@ -487,6 +487,7 @@ class Game(object):
             moves.append(local_player_move)
 
         for move in moves:
+            print move
             player_id = move['player_id']
             player = self._get_snake(player_id)
 
@@ -563,7 +564,7 @@ class Game(object):
         # GAME OVER!
         if len(alive_players) == 0:
             self.document['state']['game_over'] = True
-            
+
             print 'game over, updating highscores'
             self.game_calculate_highscore(to_kill)
 

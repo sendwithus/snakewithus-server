@@ -15,6 +15,7 @@ var Board = window.snakewithus.Board = function(ctx, canvas) {
 
   this.testPlayer = false;
   this.isStarted = false;
+  this.lastTick = 0;
 };
 
 Board.prototype.resize = function() {
@@ -54,11 +55,24 @@ Board.prototype.kick = function() {
   // DON'T KICK IF EXPECTING LOCAL INPUT
   if (this.testPlayer) { return; }
 
+  this.tick();
+};
+
+Board.prototype.tick = function() {
   var that = this;
-  this.loop = setInterval(
-    function() { that.yell.call(that); },
-    snakewithus.MOVE_DELTA
-  );
+
+  this.yell(false, function() {
+    var soonestNextTick = that.lastTick + snakewithus.MOVE_DELTA;
+    var delta = soonestNextTick - Date.now();
+
+    // Keep above 0
+    delta = Math.max(0, delta);
+
+    setTimeout(function() {
+      that.tick.call(that);
+      that.lastTick = Date.now();
+    }, delta);
+  });
 };
 
 Board.prototype.beginAnimation = function() {
@@ -83,7 +97,7 @@ Board.prototype.animate = function() {
   }
 };
 
-Board.prototype.yell = function(localPlayerMove) {
+Board.prototype.yell = function(localPlayerMove, callback) {
   if (!this.isStarted || this.isGameOver()) { return; }
   var data = {
     game_id: this.gameState.id
@@ -108,6 +122,9 @@ Board.prototype.yell = function(localPlayerMove) {
     data: JSON.stringify(data)
   }).done(function(gameState) {
     that.update(gameState);
+    if (typeof callback === 'function') {
+      callback();
+    }
   });
 };
 
