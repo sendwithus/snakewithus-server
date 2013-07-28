@@ -10,6 +10,7 @@ $(function() {
   // COMPONENTS
   var $canvas          = $(canvas);
   var $newGameButton   = $('#create-game');
+  // setTimeout(function() { $newGameButton.trigger('click'); }, 200);
   var $startGameButton = $('#start-game');
   var $joinGameButton  = $('#join-game');
   var $fetchGameButton = $('#fetch-game');
@@ -47,6 +48,15 @@ $(function() {
         $joinGameButton.fadeIn(400);
         $startGameButton.fadeIn(400);
       });
+      // $.ajax({
+      //   type: 'PUT',
+      //   contentType: 'application/json',
+      //   dataType: 'json',
+      //   url: '/game.addplayerurl/'+gameState.id,
+      //   data: JSON.stringify({
+      //     player_url: 'http://localhost:8000/'
+      //   })
+      // });
     });
   });
 
@@ -88,6 +98,7 @@ $(function() {
       })
     }).done(function(player) {
       $joinGameButton.fadeOut(200);
+      console.log('PAYER: ', player);
       board.enableTestMode(player);
     });
   });
@@ -140,7 +151,7 @@ $(function() {
       '</li>';
 
       if (snake.message !== '') {
-          var li = '<li><em>' + snake.name + '</em>:<br>' + 
+          var li = '<li><em>' + snake.name + '</em>:<br>' +
               snake.message +' </li>';
           $('#player_messages').prepend(li);
       }

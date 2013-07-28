@@ -328,19 +328,15 @@ class Game(object):
         head_img = ''
 
         if player['url'] == settings.LOCAL_PLAYER_URL:
-            player_name = 'Local Snake'
+            player['name'] = 'Local Snake'
         else:
             response = self._client_request(player, 'register', register_data)
-            player_name = response['name']
+            player['name'] = response['name']
 
             if 'head_img_url' in response:
                 head_img = response['head_img_url']
 
-        player = {
-            'name': player_name,
-            'head_img_url': head_img
-        }
-
+        player['head_img_url'] = head_img
         return player
 
     def do_client_start(self):
@@ -517,9 +513,9 @@ class Game(object):
 
         if local_player_move:
             moves.append(local_player_move)
+            print('LOCAL %s' % local_player_move)
 
         for move in moves:
-            print move
             player_id = move['player_id']
             player = self._get_snake(player_id)
 
