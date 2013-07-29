@@ -456,7 +456,8 @@ class Game(object):
 
         events = []
         for player in self.document['players']:
-            if player['url'] != settings.LOCAL_PLAYER_URL:
+            status = self._get_snake(player['id'])['status']
+            if player['url'] != settings.LOCAL_PLAYER_URL and status != 'dead':
                 events.append(gevent.spawn(get_player_move, player, snapshot))
 
         gevent.joinall(events)
