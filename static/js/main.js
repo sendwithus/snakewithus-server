@@ -163,10 +163,11 @@ $(function() {
       '</li>';
 
       if (snake.message !== '') {
-          var li = '<li><em>' + snake.name + '</em>:<br>' +
-              snake.message +' </li>';
+          var li = '<li><em class="lead">' + snake.name + '</em>: <small>' +
+              snake.message + '</small></li>';
           $('#player_messages').prepend(li);
       }
+      snake.message = '';
     }
     $playerList.html(html);
   };
