@@ -1,5 +1,5 @@
 window.snakewithus = {
-  MOVE_DELTA: 1000,
+  MOVE_DELTA: 0,
   SQUARE_PADDING: 2,
   FOOD_SIZE: 0.5,
   HEAD_OPACITY: 1,

@@ -54,8 +54,21 @@ $(function() {
       //   dataType: 'json',
       //   url: '/game.addplayerurl/'+gameState.id,
       //   data: JSON.stringify({
+      //     player_url: 'http://localhost:8000'
+      //   })
+      // }).done(function(player) {
+      //   // console.log('PLAYER ID', player);
+      // });
+      // $.ajax({
+      //   type: 'PUT',
+      //   contentType: 'application/json',
+      //   dataType: 'json',
+      //   url: '/game.addplayerurl/'+gameState.id,
+      //   data: JSON.stringify({
       //     player_url: 'http://localhost:8000/'
       //   })
+      // }).done(function(player) {
+      //   // console.log('PLAYER ID', player);
       // });
     });
   });
@@ -98,7 +111,6 @@ $(function() {
       })
     }).done(function(player) {
       $joinGameButton.fadeOut(200);
-      console.log('PAYER: ', player);
       board.enableTestMode(player);
     });
   });
