@@ -140,8 +140,8 @@ $(function() {
       '</li>';
 
       if (snake.message !== '') {
-          var li = '<li><em>' + snake.name + '</em>:<br>' + 
-              snake.message +' </li>';
+          var li = '<li>' + snake.name + ':<small>' + 
+              snake.message + '</small></li>';
           $('#player_messages').prepend(li);
       }
     }
