@@ -13,7 +13,7 @@ MONGODB_URL = os.environ.get('MONGOHQ_URL', None)
 LOCAL_PLAYER_URL = 'local_player'
 SNAKE_HEAD = 'snake_head'
 SNAKE = 'snake'
-FOOD_CHANCE = 10
+FOOD_CHANCE = 3
 
 # stats constants
 FOOD = 'food'
