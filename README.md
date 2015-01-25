@@ -22,8 +22,8 @@ A request is made to this endpoint once when you register.  Expected return data
 
 ```json
 {
-    name: "Franky",
-    head_img_url: "path/to/your/snake/head"
+    "name": "Franky",
+    "head_img_url": "path/to/your/snake/head"
 }
 ```
 
@@ -41,18 +41,18 @@ The server POSTs the game board state to your snake every tick.
 
 ```json
 {
-    game_id: "<SOME_ID>",
-    id: <ID>,
-    snakes: [ <SNAKE_OBJ> ],
-    board: [
+    "game_id": "<SOME_ID>",
+    "id": "<ID>",
+    "snakes": [ "<SNAKE_OBJ>" ],
+    "board": [
         [
             [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ... // Game square objects (see below)
             [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
             [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
         ], ...
     ],
-    turn_num: 0,
-    game_over: False
+    "turn_num": 0,
+    "game_over": false
 }
 ```
 
@@ -60,8 +60,8 @@ The server POSTs the game board state to your snake every tick.
 
 ```json
 {
-    type: "snake|food|snake_head",
-    id: "snake id or null"
+    "type": "snake|food|snake_head",
+    "id": "snake id or null"
 }
 ```
 
@@ -70,8 +70,8 @@ Expected return data:
 ```json
 
 {
-    move: "n|e|s|w",
-    message: "troll comment"
+    "move": "n|e|s|w",
+    "message": "troll comment"
 }
 
 ```
@@ -104,12 +104,12 @@ request body
 
 ```json
 {
-    game_id: "unique-id-for-game",
-    client_id: "unique-id-server-generated-for-client",
-    board: {
-        width: "width",
-        height: "height",
-        num_players: 0
+    "game_id": "unique-id-for-game",
+    "client_id": "unique-id-server-generated-for-client",
+    "board": {
+        "width": "width",
+        "height": "height",
+        "num_players": 0
     }
 }
 ```
@@ -118,8 +118,8 @@ expected response
 
 ```json
 {
-    name: "name of the snake",
-    head_img_url: "(optional) url to 10x10 image for snake head"
+    "name": "name of the snake",
+    "head_img_url": "(optional) url to 10x10 image for snake head"
 }
 ```
 
@@ -130,7 +130,7 @@ request body
 
 ```json
 {
-    game_id: "unique-id-for-game"
+    "game_id": "unique-id-for-game"
 }
 ```
 
@@ -147,7 +147,7 @@ request body
 
 ```json
 {
-    game_id: "unique-id-for-game"
+    "game_id": "unique-id-for-game"
 }
 ```
 
@@ -170,8 +170,8 @@ expected response
 
 ```json
 {
-    move: "n|e|s|w",
-    message: ""
+    "move": "n|e|s|w",
+    "message": ""
 }
 ```
 # Object Structures
@@ -179,29 +179,29 @@ expected response
 ## Game state object
 ```json
 {
-    id: "unique-id-for-game",
-    board: [
+    "id": "unique-id-for-game",
+    "board": [
         [
             [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ... // Game square objects (see below)
             [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
             [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], [{}, {}, ...], ...
         ], ...
     ],
-    snakes: [
+    "snakes": [
         {
-            id: "id of snake",
-            last_move: "",
-            name: "name of snake",
-            facing: "n|e|s|w",
-            status: "dead|alive",
-            message: "",
-            points: {
-                kills: 0,
-                food: 0,
+            "id": "id of snake",
+            "last_move": "",
+            "name": "name of snake",
+            "facing": "n|e|s|w",
+            "status": "dead|alive",
+            "message": "",
+            "points": {
+                "kills": 0,
+                "food": 0,
             }
         }, ...
     ],
-    turn_num: 0
+    "turn_num": 0
 }
 ```
 
@@ -209,8 +209,8 @@ expected response
 
 ```json
 {
-    type: "snake|food|snake_head",
-    id: "snake id or null"
+    "type": "snake|food|snake_head",
+    "id": "snake id or null"
 }
 ```
 
