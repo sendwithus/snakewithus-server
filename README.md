@@ -20,7 +20,7 @@ The snakewithus server will POST to 5 different endpoints that your snake has to
 
 A request is made to this endpoint once when you register.  Expected return data:
 
-```json
+```javascript
 {
     "name": "Franky",
     "head_img_url": "path/to/your/snake/head"
@@ -39,7 +39,7 @@ A request is made here when your snake dies.  Do stuff.
 
 The server POSTs the game board state to your snake every tick.  
 
-```json
+```javascript
 {
     "game_id": "<SOME_ID>",
     "id": "<ID>",
@@ -58,7 +58,7 @@ The server POSTs the game board state to your snake every tick.
 
 ###Game square object
 
-```json
+```javascript
 {
     "type": "snake|food|snake_head",
     "id": "snake id or null"
@@ -67,7 +67,7 @@ The server POSTs the game board state to your snake every tick.
 
 Expected return data:
 
-```json
+```javascript
 
 {
     "move": "n|e|s|w",
@@ -102,7 +102,7 @@ called when the client joins a new game
 
 request body
 
-```json
+```javascript
 {
     "game_id": "unique-id-for-game",
     "client_id": "unique-id-server-generated-for-client",
@@ -116,7 +116,7 @@ request body
 
 expected response
 
-```json
+```javascript
 {
     "name": "name of the snake",
     "head_img_url": "(optional) url to 10x10 image for snake head"
@@ -128,7 +128,7 @@ called at the start of a game
 
 request body
 
-```json
+```javascript
 {
     "game_id": "unique-id-for-game"
 }
@@ -136,7 +136,7 @@ request body
 
 expected response
 
-```json
+```javascript
 {}
 ```
 
@@ -145,7 +145,7 @@ called at the end of a game
 
 request body
 
-```json
+```javascript
 {
     "game_id": "unique-id-for-game"
 }
@@ -153,14 +153,14 @@ request body
 
 expected response
 
-```json
+```javascript
 {}
 ```
 
 ## tick
 called at every game tick
 
-```json
+```javascript
 {
     Game state object (see below)
 }
@@ -168,7 +168,7 @@ called at every game tick
 
 expected response
 
-```json
+```javascript
 {
     "move": "n|e|s|w",
     "message": ""
@@ -177,7 +177,7 @@ expected response
 # Object Structures
 
 ## Game state object
-```json
+```javascript
 {
     "id": "unique-id-for-game",
     "board": [
@@ -207,7 +207,7 @@ expected response
 
 ## Game square object
 
-```json
+```javascript
 {
     "type": "snake|food|snake_head",
     "id": "snake id or null"
